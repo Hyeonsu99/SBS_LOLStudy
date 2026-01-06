@@ -15,6 +15,6 @@ public class PlayerCommand : ICommand
 
     public void Execute()
     {
-        
+        _controller.HandleCommand(_action, _context);
     }
 }
