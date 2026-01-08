@@ -447,9 +447,11 @@ GameObject:
   - component: {fileID: 925437570}
   - component: {fileID: 925437571}
   - component: {fileID: 925437575}
+  - component: {fileID: 925437577}
   - component: {fileID: 925437574}
   - component: {fileID: 925437573}
   - component: {fileID: 925437572}
+  - component: {fileID: 925437578}
   - component: {fileID: 925437576}
   m_Layer: 0
   m_Name: Player
@@ -647,6 +649,34 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &925437577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925437565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6efe0a7c7716d354385899f97338dd72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStat
+--- !u!114 &925437578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925437565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aaf9205a0f69184b9dbdca946ded1e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitIdentity
+  unitType: 0
+  teamID: 0
+  isAlive: 1
+  isTargetable: 1
 --- !u!1 &1261704406
 GameObject:
   m_ObjectHideFlags: 0
@@ -660,7 +690,7 @@ GameObject:
   - component: {fileID: 1261704408}
   - component: {fileID: 1261704407}
   - component: {fileID: 1261704411}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}

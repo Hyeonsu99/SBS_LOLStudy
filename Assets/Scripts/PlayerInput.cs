@@ -49,7 +49,7 @@ public class PlayerInput : MonoBehaviour
         {
             if (Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
             {
-                Enqueue(PlayerAction.Move, new InputContext{ position = hit.point });
+                Enqueue(PlayerAction.Move, new InputContext{ position = hit.point, target = hit.transform.gameObject });
             }           
         }
     }

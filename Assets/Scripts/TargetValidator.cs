@@ -1,16 +1,38 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TargetValidator : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private TeamID ID;
+
+    public bool IsValidForBasicAttack(GameObject targetObj)
     {
-        
+        if(!TryGetUnitIdentity(targetObj, out UnitIdentity identity))
+        {
+            return false;
+        }
+
+        if(!identity.IsAlive)
+            return false;
+
+        if(!identity.IsTargetable)
+            return false;
+
+        if (!IsEnemy(identity))
+            return false;
+
+        return true;
     }
 
-    // Update is called once per frame
-    void Update()
+    private bool TryGetUnitIdentity(GameObject obj, out UnitIdentity identity)
     {
-        
+        identity = null;
+
+        return obj != null && obj.TryGetComponent(out identity);
+    }
+
+    private bool IsEnemy(UnitIdentity identity)
+    {
+        return identity.ID != ID;
     }
 }

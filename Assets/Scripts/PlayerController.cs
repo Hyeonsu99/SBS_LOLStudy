@@ -36,17 +36,47 @@ public class PlayerController : MonoBehaviour
         switch(action)
         {
             case PlayerAction.Move:
-                HandleMove(_agent, ctx.position);
+                HandleRightClick(ctx);
                 break;
 
         }
     }
 
-    private void HandleMove(NavMeshAgent agent, Vector3 destination)
+    private void HandleRightClick(InputContext ctx)
     {
-        if (!_positionValidator.OnNavMesh(destination))
+        if (ctx.target == null)
             return;
 
-        _movement?.Move(agent, destination);
+
+
+        if (!_positionValidator.OnNavMesh(ctx))
+            return;
+
+        _movement?.Move(_agent, ctx.position);
+    }
+
+    private void HandleBasicAttack()
+    {
+
+    }
+
+    private void HandleQSkill()
+    {
+
+    }
+
+    private void HandleWSkill()
+    {
+
+    }
+
+    private void HandleESkill()
+    {
+
+    }
+
+    private void HandleRSKill()
+    {
+
     }
 }

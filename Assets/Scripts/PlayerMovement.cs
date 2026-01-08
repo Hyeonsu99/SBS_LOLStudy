@@ -3,12 +3,12 @@ using UnityEngine.AI;
 
 public class PlayerMovement : MonoBehaviour, IUnitMovement
 {
-    public bool IsArrived(float epsilon = 0.05F)
+    public bool IsArrived(NavMeshAgent agent, float epsilon = 0.05F)
     {
         return true;
     }
 
-    public bool IsMoving()
+    public bool IsMoving(NavMeshAgent agent)
     {
         return true;
     }
@@ -18,8 +18,9 @@ public class PlayerMovement : MonoBehaviour, IUnitMovement
         agent.SetDestination(position);
     }
 
-    public void Stop()
+    public void Stop(NavMeshAgent agent)
     {
-        
+       agent.velocity = Vector3.zero;
+       agent.ResetPath();
     }
 }
