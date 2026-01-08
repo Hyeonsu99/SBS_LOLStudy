@@ -5,6 +5,12 @@ using UnityEngine.Rendering;
 
 public class Invoker : MonoBehaviour
 {
+    private struct TimedCommand
+    {
+        public ICommand command;
+        public float time;
+    }
+
     [SerializeField] private float _commandLifeTime = 0.25f;
 
     private Queue<TimedCommand> _commands = new();
@@ -38,11 +44,5 @@ public class Invoker : MonoBehaviour
     private void LateUpdate()
     {
         ExecuteCommand();
-    }
-
-    private struct TimedCommand
-    {
-        public ICommand command;
-        public float time;
     }
 }
