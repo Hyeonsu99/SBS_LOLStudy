@@ -47,12 +47,15 @@ public class PlayerController : MonoBehaviour
         if (ctx.target == null)
             return;
 
+        if(!_targetValidator.IsValidForBasicAttack(ctx.target))
+        {
+            int layer = ctx.target.layer;
 
-
-        if (!_positionValidator.OnNavMesh(ctx))
-            return;
-
-        _movement?.Move(_agent, ctx.position);
+            if (!_positionValidator.IsValidMovePosition(ctx.position, layer))
+                return;
+            
+            _movement?.Move(_agent, ctx.position);
+        }
     }
 
     private void HandleBasicAttack()

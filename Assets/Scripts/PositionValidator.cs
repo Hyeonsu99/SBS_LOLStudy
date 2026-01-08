@@ -4,23 +4,13 @@ using UnityEngine.AI;
 public class PositionValidator : MonoBehaviour
 {
     // 나중에 수정이 필요할수도... 여기서 땅 유효검사..?
-    public bool IsGroundLayer(int layer)
-    {
-        return true;
-    }
+    // 나중에 NavMesh Layer로 조정해야할 듯
 
-    public bool IsOnNavMesh(Vector3 point, int layer)
+    public bool IsValidMovePosition(Vector3 position, int hitLayer)
     {
-        return true;
-    }
-    public bool OnNavMesh(InputContext ctx)
-    {
-        if(ctx.target.layer != LayerMask.NameToLayer(StringValue.GroundLayerName))
+        if (hitLayer != LayerMask.NameToLayer(StringValue.GroundLayerName))
             return false;
 
-        if(NavMesh.SamplePosition(ctx.position, out NavMeshHit hit, 1.0f, NavMesh.AllAreas))
-            return true;
-
-        return false;
+        return NavMesh.SamplePosition(position, out NavMeshHit hit, 1.0f, NavMesh.AllAreas);
     }
 }
