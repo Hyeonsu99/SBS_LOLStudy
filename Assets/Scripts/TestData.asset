@@ -24,6 +24,7 @@ MonoBehaviour:
   Armor: 30
   MagicResist: 6
   MoveSpeed: 330
+  LevelGrowth: 1
   HpGrowth: 107
   HpRegenGrowth: 0.55
   MpGrowth: 50

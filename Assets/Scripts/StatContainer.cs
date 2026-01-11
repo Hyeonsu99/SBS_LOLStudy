@@ -82,6 +82,8 @@ public class LevelStatDecorator : IStat
 
         if(growth <= 0) return baseValue;
 
+        // 공속, 방어력, 마법 저항력 수치 조정
+
         return baseValue + growth * (n - 1) * (0.7025f + 0.0175f * (n - 1));
     }
 
