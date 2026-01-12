@@ -21,7 +21,7 @@ public enum StatType
 
 public enum ModType
 {
-    Add,
+    Flat,
     PercentMul,
     PercentAdd
 }
@@ -30,14 +30,14 @@ public readonly struct StatModifier
 {
     public readonly string ID;
     public readonly StatType Stat;
-    public readonly ModType Mode;
+    public readonly ModType Mod;
     public readonly float Value;
 
     public StatModifier(StatType stat, ModType mode, float value)
     {
         ID = null;
         Stat = stat;
-        Mode = mode;
+        Mod = mode;
         Value = value;
     }
 
@@ -45,7 +45,7 @@ public readonly struct StatModifier
     {
         ID = id;
         Stat = stat;
-        Mode = mode;
+        Mod = mode;
         Value = value;
     }
 }

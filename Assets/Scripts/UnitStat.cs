@@ -85,19 +85,32 @@ public class UnitStat : MonoBehaviour
 
         IStat result = baseEntity;
 
-        foreach(var mod in _mods)
+        // 레벨 및 성장 적용
+        foreach(var mod in _mods.FindAll(m => m.Stat == StatType.Level))
         {
-            if (mod.Stat == StatType.Level)
-                result = new StatDecorator(result, mod, 0);
+            result = new StatDecorator(result, mod, baseEntity);
         }
 
         result = new LevelStatDecorator(result, StatData);
         _growthChain = result;
 
-        foreach (var mod in _mods)
+        // 아이템/버프 Modifier 추출
+        var statMods = _mods.FindAll(m => m.Stat != StatType.Level);
+
+        // 계산 우선 순위 사용
+        ModType[] priorityOrder =
         {
-            if(mod.Stat != StatType.Level)
-                result = new StatDecorator(result, mod, originAS);
+            ModType.Flat,
+            ModType.PercentAdd,
+            ModType.PercentMul
+        };
+
+        foreach (ModType modType in priorityOrder)
+        {
+            foreach (var mod in statMods.FindAll(m => m.Mod == modType))
+            {
+                result = new StatDecorator(result, mod, baseEntity);
+            }
         }
 
         Current = result;
@@ -112,15 +125,6 @@ public class UnitStat : MonoBehaviour
     // 
     public void RemoveModifier(StatModifier modifier)
     {
-        //foreach(var mod in _mods)
-        //{
-        //    if(mod.ID == modifier.ID)
-        //    {
-        //        _mods.Remove(mod);
-        //        _mods.Add(modifier);
-        //    }
-        //}
-
         _mods.RemoveAll(m => m.ID == modifier.ID);
         Rebuild();
     }
@@ -130,15 +134,15 @@ public class UnitStat : MonoBehaviour
         _mods.RemoveAll(m => m.ID == "CurrentLevel");
 
         int amount = targetLevel - 1;
-        _mods.Add(new StatModifier("CurrentLevel", StatType.Level, ModType.Add, amount));
+        _mods.Add(new StatModifier("CurrentLevel", StatType.Level, ModType.Flat, amount));
 
         Rebuild();
         Debug.Log(Current.Level);
     }
 
-    public string ApplyEffect(EffectType type, float duration, float value)
+    public string ApplyEffect(EffectType type, ModType mod, float duration, float value)
     {
-        var effect = EffectFactory.Create(gameObject, type, duration, value);
+        var effect = EffectFactory.Create(gameObject, type, mod, duration, value);
 
         if(effect != null)
         {
@@ -149,7 +153,7 @@ public class UnitStat : MonoBehaviour
         return null;
     }
 
-    public string RefreshEffect(EffectType type, float duration, float value)
+    public string RefreshEffect(EffectType type, float duration, ModType mod, float value)
     {
         string effectType = GetEffetTypeName(type);
         var exist = FindEffectByType(effectType);
@@ -161,7 +165,7 @@ public class UnitStat : MonoBehaviour
         }
         else
         {
-            return ApplyEffect(type, duration, value);
+            return ApplyEffect(type, mod, duration, value);
         }
     }
 
@@ -267,6 +271,22 @@ public class UnitStat : MonoBehaviour
     [Button(ButtonSizes.Medium)]
     public void TestSpeedBuff()
     {
-        ApplyEffect(EffectType.SpeedBuff, 3f, 1.1f);
+        ApplyEffect(EffectType.SpeedBuff, ModType.PercentAdd, 3f, 0.1f);
+    }
+
+    // 깡 공격력 30 더하기
+    [BoxGroup("Buff Test")]
+    [Button(ButtonSizes.Medium)]
+    public void TestAdBuff1()
+    {
+        ApplyEffect(EffectType.AttackBuff, ModType.Flat, 5f, 30);
+    }
+
+    // 총 공격력 50% 증가
+    [BoxGroup("Buff Test")]
+    [Button(ButtonSizes.Medium)]
+    public void TestAdBuff2()
+    {
+        ApplyEffect(EffectType.AttackBuff, ModType.PercentMul, 5f, 0.5f);
     }
 }

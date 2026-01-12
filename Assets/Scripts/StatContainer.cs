@@ -28,22 +28,27 @@ public class StatDecorator : IStat
 {
     private readonly IStat _wrapped;
     private readonly StatModifier _mod;
-    private readonly float _originBaseValue;
+    private readonly IStat _baseEntity;
 
-    public StatDecorator(IStat wrapped, StatModifier mod, float originBaseValue = 0f)
+    public StatDecorator(IStat wrapped, StatModifier mod, IStat baseEntity)
     {
         _wrapped = wrapped;
         _mod = mod;
-        _originBaseValue = originBaseValue;
+        _baseEntity = baseEntity;
     }
     public float Get(StatType type)
     {
         float value = _wrapped.Get(type);
 
-        return _mod.Mode switch
+        if(_mod.Stat != type)
         {
-            ModType.Add => value + _mod.Value,
-            ModType.PercentAdd => value + (_originBaseValue * _mod.Value),
+            return value;
+        }
+
+        return _mod.Mod switch
+        {
+            ModType.Flat => value + _mod.Value,
+            ModType.PercentAdd => value + (_baseEntity.Get(type) * _mod.Value),
             ModType.PercentMul => value * (1 + _mod.Value),
             _ => value
         };
