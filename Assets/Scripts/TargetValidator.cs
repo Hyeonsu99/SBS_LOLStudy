@@ -5,7 +5,7 @@ public class TargetValidator : MonoBehaviour
 {
     [SerializeField] private TeamID ID;
 
-    public bool IsValidForBasicAttack(GameObject targetObj)
+    public bool IsValidTargetForBasicAttack(GameObject targetObj)
     {
         if(!TryGetUnitIdentity(targetObj, out UnitIdentity identity))
         {

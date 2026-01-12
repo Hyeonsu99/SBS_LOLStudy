@@ -1,9 +1,10 @@
+using NUnit.Framework.Constraints;
 using UnityEngine;
 
 public enum EffectType
 {
     AttackBuff,
-    MoveSpeedMove,
+    SpeedBuff,
     ArmorBuff,
     AttackSpeedBuff,
     AbilityPowerBuff,
@@ -14,18 +15,30 @@ public enum EffectType
     // 디버프 타입 쭉 추가
 }
 
-public class EffectFactory : MonoBehaviour
+public static class EffectFactory
 {
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static Effect Create(GameObject target, EffectType type, float duration, float value)
     {
-        
-    }
+        UnitStat stat = target.GetComponent<UnitStat>();
+        if (stat == null)
+        {
+            Debug.LogError("UnitStat 컴포넌트 참조 실패!!");
+            return null;
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Effect effect = null;
+
+        switch (type)
+        {
+            case EffectType.AttackBuff:
+                break;
+            case EffectType.SpeedBuff:
+                var speedBuff = target.AddComponent<SpeedBuff>();
+                speedBuff.Initialize(stat, duration, value);
+                effect = speedBuff;
+                break;
+        }
+
+        return effect;
     }
 }

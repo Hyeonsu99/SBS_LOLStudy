@@ -823,8 +823,9 @@ GameObject:
   - component: {fileID: 925437573}
   - component: {fileID: 925437572}
   - component: {fileID: 925437578}
+  - component: {fileID: 925437579}
   - component: {fileID: 925437576}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1030,7 +1031,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 925437565}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6efe0a7c7716d354385899f97338dd72, type: 3}
+  m_Script: {fileID: 11500000, guid: f41a4b28aeeef3a4e8e7ecbbb2b0d6aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStat
   StatData: {fileID: 11400000, guid: 0e4d3153c5677b44789a8d81a7906480, type: 2}
@@ -1050,6 +1051,18 @@ MonoBehaviour:
   teamID: 0
   isAlive: 1
   isTargetable: 1
+--- !u!114 &925437579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925437565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba6e0136b3ba1384b95477566caeba4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatHandler
 --- !u!1 &1261704406
 GameObject:
   m_ObjectHideFlags: 0
@@ -1287,7 +1300,7 @@ GameObject:
   - component: {fileID: 1833042953}
   - component: {fileID: 1833042952}
   - component: {fileID: 1833042951}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1398,7 +1411,7 @@ Transform:
   m_GameObject: {fileID: 1833042950}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: 1, z: 0}
+  m_LocalPosition: {x: 12.58, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

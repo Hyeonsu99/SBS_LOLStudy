@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c1a897c0ab12a74fb0b6a974ee8ee1d, type: 3}
-  m_Name: TestData
+  m_Name: Jhin
   m_EditorClassIdentifier: Assembly-CSharp::StatData
   Level: 1
   Hp: 655
@@ -18,11 +18,13 @@ MonoBehaviour:
   Mp: 300
   MpRegen: 6
   AttackDamage: 61
+  CriticalAmount: 0
+  CriticalDamage: 200
   AttackRange: 550
   AttackSpeed: 0.625
-  AbilityPower: 24
-  Armor: 30
-  MagicResist: 6
+  AbilityPower: 0
+  Armor: 24
+  MagicResist: 30
   MoveSpeed: 330
   LevelGrowth: 1
   HpGrowth: 107

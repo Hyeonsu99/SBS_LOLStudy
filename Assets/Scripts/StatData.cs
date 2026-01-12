@@ -11,6 +11,8 @@ public class StatData : ScriptableObject
     public float Mp;
     public float MpRegen;
     public float AttackDamage;
+    public float CriticalAmount;
+    public float CriticalDamage;
     public float AttackRange;
     public float AttackSpeed;
     public float AbilityPower = 0f;
@@ -40,6 +42,8 @@ public class StatData : ScriptableObject
             StatType.Mp => Mp,
             StatType.MpRegen => MpRegen,
             StatType.AttackDamage => AttackDamage,
+            StatType.CriticalAmount => CriticalAmount,
+            StatType.CriticalDamage => CriticalDamage,
             StatType.AttackRange => AttackRange,
             StatType.AttackSpeed => AttackSpeed,
             StatType.AbilityPower => AbilityPower,

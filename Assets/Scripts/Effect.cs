@@ -8,10 +8,10 @@ public abstract class Effect : MonoBehaviour
     public float RemainTime { get; protected set; }
     public bool IsExpired => RemainTime <= 0f;
 
-    protected PlayerStat targetStat;
+    protected UnitStat targetStat;
     protected StatModifier modifier;
 
-    public virtual void Initialize(PlayerStat stat, float duration)
+    public virtual void Initialize(UnitStat stat, float duration)
     {
         targetStat = stat;
         Duration = duration;
@@ -31,8 +31,14 @@ public abstract class Effect : MonoBehaviour
 
         if(IsExpired)
         {
+            Remove();
             Destroy(this);
         }
+    }
+
+    protected virtual void OnDestroy()
+    {
+        Remove();
     }
 
     // 효과 제거 함수
@@ -44,4 +50,6 @@ public abstract class Effect : MonoBehaviour
 
         Debug.Log($"{EffectID} 효과 갱신!");
     }
+
+    public StatModifier GetModifier() => modifier;
 }

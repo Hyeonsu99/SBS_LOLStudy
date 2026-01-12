@@ -7,6 +7,8 @@ public class PlayerInput : MonoBehaviour
     private Invoker _invoker;
     private Camera _mainCamera;
 
+    public GameObject HoverTarget { get; private set; }
+
     private void Awake()
     {
         _invoker = GetComponent<Invoker>();
@@ -52,10 +54,24 @@ public class PlayerInput : MonoBehaviour
                 Enqueue(PlayerAction.Move, new InputContext{ position = hit.point, target = hit.transform.gameObject });
             }           
         }
+
+        UpdateMoveHover();
     }
 
     private void Enqueue(PlayerAction action, InputContext ctx)
     {
         _invoker.EnqueueCommand(new PlayerCommand(_controller, action, ctx));
+    }
+
+    private void UpdateMoveHover()
+    {
+        if(Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
+        {
+            HoverTarget = hit.transform.gameObject;
+        }
+        else
+        {
+            HoverTarget = null;
+        }
     }
 }

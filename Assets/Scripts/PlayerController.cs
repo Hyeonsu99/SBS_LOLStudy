@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
 {
     PositionValidator _positionValidator;
     TargetValidator _targetValidator;
+    CombatHandler _combatHandler;
+    UnitStat _stat;
 
     IUnitMovement _movement;
     NavMeshAgent _agent;
@@ -15,8 +17,10 @@ public class PlayerController : MonoBehaviour
     {
         _positionValidator = GetComponent<PositionValidator>();
         _targetValidator = GetComponent<TargetValidator>();
+        _combatHandler = GetComponent<CombatHandler>();
         _movement = GetComponent<PlayerMovement>() as IUnitMovement;
         _agent = GetComponent<NavMeshAgent>();
+        _stat = GetComponent<UnitStat>();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -28,7 +32,28 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(_combatHandler.HasTarget())
+        {
+            if(!_combatHandler.IsTargetValid())
+            {
+                _combatHandler.ClearTarget();
+                _agent.ResetPath();
+                return;
+            }
+
+            float range = _stat.Current.AttackRange / 100f;
+            float distance = Vector3.Distance(transform.position, _combatHandler.GetTargetPosition());
+
+            if(distance <= range)
+            {
+                _agent.ResetPath();
+                _combatHandler.UpdateCombat();
+            }
+            else
+            {
+                _movement?.Move(_agent, _combatHandler.GetTargetPosition());
+            }
+        }
     }
 
     public void HandleCommand(PlayerAction action, InputContext ctx)
@@ -47,14 +72,17 @@ public class PlayerController : MonoBehaviour
         if (ctx.target == null)
             return;
 
-        if(!_targetValidator.IsValidForBasicAttack(ctx.target))
+        if(_targetValidator.IsValidTargetForBasicAttack(ctx.target))
         {
-            int layer = ctx.target.layer;
-
-            if (!_positionValidator.IsValidMovePosition(ctx.position, layer))
-                return;
-            
-            _movement?.Move(_agent, ctx.position);
+            _combatHandler.SetTarget(ctx.target);
+        }
+        else
+        {
+            _combatHandler.ClearTarget();
+            if (_positionValidator.IsValidMovePosition(ctx.position, ctx.target.layer))
+            {
+                _movement?.Move(_agent, ctx.position);
+            }
         }
     }
 

@@ -14,7 +14,9 @@ public enum StatType
     AbilityPower,
     Armor,
     MagicResist,
-    MoveSpeed
+    MoveSpeed,
+    CriticalAmount,
+    CriticalDamage
 }
 
 public enum ModType

@@ -1,7 +1,5 @@
-using NUnit.Framework;
-using Sirenix.OdinInspector;
-using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 // 챔피언의 1레벨 초기 스탯 보관용
 public class StatEntity : IStat
@@ -16,6 +14,8 @@ public class StatEntity : IStat
     public float Mp => Get(StatType.Mp);
     public float MpRegen => Get(StatType.MpRegen);
     public float AttackDamage => Get(StatType.AttackDamage);
+    public float CriticalAmount => Get(StatType.CriticalAmount);
+    public float CriticalDamage => Get(StatType.CriticalDamage);
     public float AttackRange => Get(StatType.AttackRange);
     public float AttackSpeed => Get(StatType.AttackSpeed);
     public float AbilityPower => Get(StatType.AbilityPower);
@@ -52,6 +52,8 @@ public class StatDecorator : IStat
     public float Mp => Get(StatType.Mp);
     public float MpRegen => Get(StatType.MpRegen);
     public float AttackDamage => Get(StatType.AttackDamage);
+    public float CriticalAmount => Get(StatType.CriticalAmount);
+    public float CriticalDamage => Get(StatType.CriticalDamage);
     public float AttackRange => Get(StatType.AttackRange);
     public float AttackSpeed => Get(StatType.AttackSpeed);
     public float AbilityPower => Get(StatType.AbilityPower);
@@ -84,7 +86,14 @@ public class LevelStatDecorator : IStat
 
         // 공속, 방어력, 마법 저항력 수치 조정
 
-        return baseValue + growth * (n - 1) * (0.7025f + 0.0175f * (n - 1));
+        if(type == StatType.AttackSpeed)
+        {
+            return baseValue * (1 + (growth * (n - 1)));
+        }
+
+        float factor = (n - 1) * (0.7025f + 0.0175f * (n - 1));
+
+        return baseValue + (growth * factor);
     }
 
     public float Level => Get(StatType.Level);
@@ -93,6 +102,8 @@ public class LevelStatDecorator : IStat
     public float Mp => Get(StatType.Mp);
     public float MpRegen => Get(StatType.MpRegen);
     public float AttackDamage => Get(StatType.AttackDamage);
+    public float CriticalAmount => Get(StatType.CriticalAmount);
+    public float CriticalDamage => Get(StatType.CriticalDamage);
     public float AttackRange => Get(StatType.AttackRange);
     public float AttackSpeed => Get(StatType.AttackSpeed);
     public float AbilityPower => Get(StatType.AbilityPower);
