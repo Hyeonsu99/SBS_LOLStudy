@@ -22,7 +22,8 @@ public enum StatType
 public enum ModType
 {
     Add,
-    Mul
+    PercentMul,
+    PercentAdd
 }
 
 public readonly struct StatModifier

@@ -16,6 +16,7 @@ public class UnitStat : MonoBehaviour
 
     private List<string> _expiredEffects = new();
     public IStat Current { get; private set; }
+    private IStat _growthChain; // 레벨 성장치까지만 계산된 스탯
 
     [Title("Final Statistics")]
     [ShowInInspector, Sirenix.OdinInspector.ReadOnly]
@@ -79,20 +80,24 @@ public class UnitStat : MonoBehaviour
     {
         if (StatData == null) return;
 
-        IStat result = new StatEntity(StatData);
+        IStat baseEntity = new StatEntity(StatData);
+        float originAS = baseEntity.Get(StatType.AttackSpeed);
+
+        IStat result = baseEntity;
 
         foreach(var mod in _mods)
         {
             if (mod.Stat == StatType.Level)
-                result = new StatDecorator(result, mod);
+                result = new StatDecorator(result, mod, 0);
         }
 
         result = new LevelStatDecorator(result, StatData);
+        _growthChain = result;
 
         foreach (var mod in _mods)
         {
             if(mod.Stat != StatType.Level)
-                result = new StatDecorator(result, mod);
+                result = new StatDecorator(result, mod, originAS);
         }
 
         Current = result;

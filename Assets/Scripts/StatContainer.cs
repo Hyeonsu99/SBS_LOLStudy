@@ -28,22 +28,25 @@ public class StatDecorator : IStat
 {
     private readonly IStat _wrapped;
     private readonly StatModifier _mod;
+    private readonly float _originBaseValue;
 
-    public StatDecorator(IStat wrapped, StatModifier mod)
+    public StatDecorator(IStat wrapped, StatModifier mod, float originBaseValue = 0f)
     {
         _wrapped = wrapped;
         _mod = mod;
+        _originBaseValue = originBaseValue;
     }
     public float Get(StatType type)
     {
         float value = _wrapped.Get(type);
 
-        if(_mod.Stat == type)
+        return _mod.Mode switch
         {
-            return _mod.Mode == ModType.Add ? value + _mod.Value : value * _mod.Value;
-        }
-
-        return value;
+            ModType.Add => value + _mod.Value,
+            ModType.PercentAdd => value + (_originBaseValue * _mod.Value),
+            ModType.PercentMul => value * (1 + _mod.Value),
+            _ => value
+        };
     }
 
     public float Level => Get(StatType.Level);
@@ -79,20 +82,17 @@ public class LevelStatDecorator : IStat
 
         if(type == StatType.Level) return baseValue;
 
-        float n = _wrapped.Get(StatType.Level);
+        float n = Mathf.Clamp(_wrapped.Get(StatType.Level), 1f, 18f);
         float growth = _data.GetGrowth(type);
 
         if(growth <= 0) return baseValue;
 
-        // 공속, 방어력, 마법 저항력 수치 조정
-
         if(type == StatType.AttackSpeed)
         {
-            return baseValue * (1 + (growth * (n - 1)));
+            return baseValue * (1 + (growth * (n - 1f)));
         }
 
         float factor = (n - 1) * (0.7025f + 0.0175f * (n - 1));
-
         return baseValue + (growth * factor);
     }
 
