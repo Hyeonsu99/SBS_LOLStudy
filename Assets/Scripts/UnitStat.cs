@@ -86,9 +86,10 @@ public class UnitStat : MonoBehaviour
         IStat result = baseEntity;
 
         // 레벨 및 성장 적용
-        foreach(var mod in _mods.FindAll(m => m.Stat == StatType.Level))
+        foreach(var mod in _mods)
         {
-            result = new StatDecorator(result, mod, baseEntity);
+            if(mod.Stat == StatType.Level)
+                result = new StatDecorator(result, mod, baseEntity);
         }
 
         result = new LevelStatDecorator(result, StatData);

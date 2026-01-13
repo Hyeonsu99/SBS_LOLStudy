@@ -1,32 +1,61 @@
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum TargetType
 {
-    AllyChampion,
-    EnemyChampion,
-    EnemyAll,
+    None,
+    Self,
+    EnemyTarget,
+    AllyTarget,
     Ground,
-    Any
+    EnemyAll
 }
 
 public enum DeliveryType
 {
-    Single,
-    PointAOE,
-    NonTargetPoint,
-    NonTargetLine
+    Passive,
+    Instant,
+    Projectile,
+    Area,
+    Buff
 }
 
 public abstract class SkillData : ScriptableObject
 {
     public string SkillId;
     public string SkillName;
+    public Sprite Icon;
+    public string Description;
 
     public TargetType Type_Target;
     public DeliveryType Type_Delivery;
-    public float Range;
+
+    [Header("Level Data")]
+    public int MaxLevel = 5;
+    public float[] Costs;
+    public float[] Cooldowns;
+    public float[] Ranges;
     // 장판기 혹은 범위기일 경우 반경
     public float Radius;
 
-    public abstract void Execute(GameObject owner, GameObject target, Vector3 position);
+    public float GetCost(int level) => GetVal(Costs, level);
+    public float GetCooldown(int level) => GetVal(Cooldowns, level);
+    public float GetRange(int level) => GetVal(Ranges, level);
+
+    protected float GetVal(float[] arr, int level)
+    {
+        if (arr == null || arr.Length == 0) return 0f;
+
+        return arr[Mathf.Clamp(level - 1, 0, arr.Length- 1)];   
+    }
+
+    // 액티브 스킬 부분
+    public abstract void Execute(GameObject owner, GameObject target, Vector3 position, int level);
+
+    // 패시브 적용
+    public virtual void ApplyPassive(GameObject owner, int level) { }
+
+    // 패시브 해제
+    public virtual void RemovePassive(GameObject owner) { }
 }

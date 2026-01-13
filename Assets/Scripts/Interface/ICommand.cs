@@ -8,12 +8,12 @@ public enum PlayerAction
     CastSummoner
 }
 
-public enum SkillSlot
+public enum SkillCommand
 {
     Q,W,E,R
 }
 
-public enum SummonerSlot
+public enum SummonerCommand
 {
     D,F
 }
@@ -24,8 +24,8 @@ public struct InputContext
     public GameObject target;
     public Vector3 direction;
 
-    public SkillSlot skillSlot;
-    public SummonerSlot summonerSlot;
+    public SkillCommand skillSlot;
+    public SummonerCommand summonerSlot;
 
     public static InputContext Empty => default;
 }
