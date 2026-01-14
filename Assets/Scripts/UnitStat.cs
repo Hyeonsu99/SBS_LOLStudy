@@ -10,11 +10,14 @@ public class UnitStat : MonoBehaviour
 {
     [SerializeField] private StatData StatData;
 
+    [ShowInInspector]
     private readonly List<StatModifier> _mods = new();
 
     private Dictionary<string, Effect> _activeEffects = new();
 
     private List<string> _expiredEffects = new();
+
+    private readonly List<IStatTransformer> _transformers = new();
     public IStat Current { get; private set; }
     private IStat _growthChain; // 레벨 성장치까지만 계산된 스탯
 
@@ -81,7 +84,6 @@ public class UnitStat : MonoBehaviour
         if (StatData == null) return;
 
         IStat baseEntity = new StatEntity(StatData);
-        float originAS = baseEntity.Get(StatType.AttackSpeed);
 
         IStat result = baseEntity;
 
@@ -114,6 +116,12 @@ public class UnitStat : MonoBehaviour
             }
         }
 
+        // 스탯 변환 적용(방어력의 50%만큼 체력이 늘어난다던지...)
+        if(_transformers.Count > 0)
+        {
+            result = new TransformStatDecorator(result, baseEntity, _transformers);
+        }
+
         Current = result;
     }
 
@@ -129,6 +137,10 @@ public class UnitStat : MonoBehaviour
         _mods.RemoveAll(m => m.ID == modifier.ID);
         Rebuild();
     }
+
+    public void AddTransformer(IStatTransformer transformer) { _transformers.Add(transformer); Rebuild(); }
+
+    public void RemoveTransformer(IStatTransformer transformer) { _transformers.Remove(transformer); Rebuild(); }
 
     public void UpdateLevel(int targetLevel)
     {
@@ -176,6 +188,16 @@ public class UnitStat : MonoBehaviour
         {
             Destroy(_activeEffects[id]);
             _activeEffects.Remove(id);
+        }
+    }
+
+    public float GetBonusStat(StatType type)
+    {
+        float bonus = 0f;
+
+        foreach(var mod in _mods)
+        {
+
         }
     }
 
@@ -289,5 +311,14 @@ public class UnitStat : MonoBehaviour
     public void TestAdBuff2()
     {
         ApplyEffect(EffectType.AttackBuff, ModType.PercentMul, 5f, 0.5f);
+    }
+
+    [BoxGroup("Passive Test")]
+    [Button(ButtonSizes.Medium)]
+    public void TestASIncrease()
+    {
+        AddModifier(new StatModifier("TestAS", StatType.AttackSpeed, ModType.PercentMul, 0.2f));
+
+        Rebuild();
     }
 }

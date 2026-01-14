@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -8,6 +9,7 @@ public class PlayerController : MonoBehaviour
     PositionValidator _positionValidator;
     TargetValidator _targetValidator;
     CombatHandler _combatHandler;
+    SkillHandler _skillHandler;
     UnitStat _stat;
 
     IUnitMovement _movement;
@@ -18,6 +20,7 @@ public class PlayerController : MonoBehaviour
         _positionValidator = GetComponent<PositionValidator>();
         _targetValidator = GetComponent<TargetValidator>();
         _combatHandler = GetComponent<CombatHandler>();
+        _skillHandler = GetComponent<SkillHandler>();
         _movement = GetComponent<PlayerMovement>() as IUnitMovement;
         _agent = GetComponent<NavMeshAgent>();
         _stat = GetComponent<UnitStat>();
@@ -63,6 +66,12 @@ public class PlayerController : MonoBehaviour
             case PlayerAction.Move:
                 HandleRightClick(ctx);
                 break;
+            case PlayerAction.CastSkill:
+                HandleSkill(ctx);
+                break;
+            case PlayerAction.CastSummoner:
+                HandleSummoner(ctx);
+                break;
 
         }
     }
@@ -86,28 +95,37 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HandleBasicAttack()
+    private void HandleSkill(InputContext ctx)
     {
-
+        switch (ctx.skillCommand)
+        {
+            case SkillCommand.Q:
+                Debug.Log("Q 스킬 발동");
+                break;
+            case SkillCommand.W:
+                Debug.Log("W 스킬 발동");
+                break;
+            case SkillCommand.E:
+                Debug.Log("E 스킬 발동");
+                break;
+            case SkillCommand.R:
+                Debug.Log("R 스킬 발동");
+                break;
+            default:
+                break;
+        }
     }
 
-    private void HandleQSkill()
+    private void HandleSummoner(InputContext ctx)
     {
-
-    }
-
-    private void HandleWSkill()
-    {
-
-    }
-
-    private void HandleESkill()
-    {
-
-    }
-
-    private void HandleRSKill()
-    {
-
+        switch(ctx.summonerCommand)
+        {
+            case SummonerCommand.D:
+                Debug.Log("D 스펠 발동");
+                break;
+            case SummonerCommand.F:
+                Debug.Log("F 스펠 발동");
+                break;
+        }
     }
 }

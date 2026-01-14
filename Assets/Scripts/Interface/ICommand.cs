@@ -24,8 +24,8 @@ public struct InputContext
     public GameObject target;
     public Vector3 direction;
 
-    public SkillCommand skillSlot;
-    public SummonerCommand summonerSlot;
+    public SkillCommand skillCommand;
+    public SummonerCommand summonerCommand;
 
     public static InputContext Empty => default;
 }

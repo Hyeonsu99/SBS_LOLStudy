@@ -21,7 +21,8 @@ public enum DeliveryType
     Buff
 }
 
-public abstract class SkillData : ScriptableObject
+[CreateAssetMenu(menuName = "Data/Skill Data")]
+public class SkillData : ScriptableObject
 {
     public string SkillId;
     public string SkillName;
@@ -51,11 +52,7 @@ public abstract class SkillData : ScriptableObject
     }
 
     // 액티브 스킬 부분
-    public abstract void Execute(GameObject owner, GameObject target, Vector3 position, int level);
-
-    // 패시브 적용
-    public virtual void ApplyPassive(GameObject owner, int level) { }
-
-    // 패시브 해제
-    public virtual void RemovePassive(GameObject owner) { }
+    public virtual void Execute(GameObject owner, GameObject target, Vector3 position, int level) { }
+    public virtual void OnEquip(GameObject owner, UnitStat stat, int level) { }
+    public virtual void OnUnEquip(GameObject owner) { }
 }

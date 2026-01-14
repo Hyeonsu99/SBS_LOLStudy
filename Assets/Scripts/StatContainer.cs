@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 // 챔피언의 1레벨 초기 스탯 보관용
 public class StatEntity : IStat
@@ -99,6 +100,47 @@ public class LevelStatDecorator : IStat
 
         float factor = (n - 1) * (0.7025f + 0.0175f * (n - 1));
         return baseValue + (growth * factor);
+    }
+
+    public float Level => Get(StatType.Level);
+    public float Hp => Get(StatType.Hp);
+    public float HpRegen => Get(StatType.HpRegen);
+    public float Mp => Get(StatType.Mp);
+    public float MpRegen => Get(StatType.MpRegen);
+    public float AttackDamage => Get(StatType.AttackDamage);
+    public float CriticalAmount => Get(StatType.CriticalAmount);
+    public float CriticalDamage => Get(StatType.CriticalDamage);
+    public float AttackRange => Get(StatType.AttackRange);
+    public float AttackSpeed => Get(StatType.AttackSpeed);
+    public float AbilityPower => Get(StatType.AbilityPower);
+    public float Armor => Get(StatType.Armor);
+    public float MagicResist => Get(StatType.MagicResist);
+    public float MoveSpeed => Get(StatType.MoveSpeed);
+}
+
+public class TransformStatDecorator : IStat
+{
+    private readonly IStat _wrapped;
+    private readonly IStat _baseStat;
+    private readonly List<IStatTransformer> _transformers;
+
+    public TransformStatDecorator(IStat wrapped, IStat baseStat, List<IStatTransformer> transformers)
+    {
+        _wrapped = wrapped;
+        _baseStat = baseStat;
+        _transformers = transformers;
+    }   
+
+    public float Get(StatType type)
+    {
+        float value = _wrapped.Get(type);
+
+        foreach(var transfomer in _transformers)
+        {
+            value = transfomer.Transform(type, value, _baseStat, _wrapped);
+        }
+
+        return value;
     }
 
     public float Level => Get(StatType.Level);
