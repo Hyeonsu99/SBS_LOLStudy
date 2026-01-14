@@ -11,13 +11,13 @@ public abstract class Effect : MonoBehaviour
     protected UnitStat targetStat;
     protected StatModifier modifier;
 
-    public virtual void Initialize(UnitStat stat, float duration)
+    public virtual void Initialize(UnitStat stat, float duration, string customID = null)
     {
         targetStat = stat;
         Duration = duration;
         RemainTime = duration;
 
-        EffectID = $"{EffectType}_{Time.time}_{Random.Range(1000, 9999)}";
+        EffectID = string.IsNullOrEmpty(customID) ? $"{EffectType}_{Time.time}_{Random.Range(1000, 9999)}" : customID;
 
         Apply();
     }

@@ -15,7 +15,7 @@ public class AttackBuff : Effect
 
     protected override void Apply()
     {
-        modifier = new StatModifier(EffectID, StatType.AttackDamage, modType, attackBouns);
+        modifier = new StatModifier(EffectID, StatType.AttackDamage, modType, attackBouns, ModifierType.Buff);
         targetStat.AddModifier(modifier);
         Debug.Log($"{EffectID}_공격력 버프 적용 + {Duration}초 지속");
     }

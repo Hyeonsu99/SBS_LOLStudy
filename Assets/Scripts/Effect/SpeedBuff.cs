@@ -17,7 +17,7 @@ public class SpeedBuff : Effect
     protected override void Apply()
     {
         // 곱연산 증가
-        modifier = new StatModifier(EffectID, StatType.MoveSpeed, modType, speedBonus);
+        modifier = new StatModifier(EffectID, StatType.MoveSpeed, modType, speedBonus, ModifierType.Buff);
         targetStat.AddModifier(modifier);
         Debug.Log($"{EffectID}_이동속도 버프 적용 + {Duration}초 지속");
     }

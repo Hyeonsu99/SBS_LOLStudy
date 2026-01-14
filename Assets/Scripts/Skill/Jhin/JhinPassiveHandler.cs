@@ -36,8 +36,16 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
             float critAmount = _stat.Current.Get(StatType.CriticalAmount);
             float currentLevel = _stat.Current.Get(StatType.Level);
 
+            float levelFactor = Mathf.Lerp(0.04f, 0.44f, (Mathf.Clamp(currentLevel, 1, 18) - 1) / 17f);
+            float statFactor = (bonusAS * _data.AS_to_AD_Ratio + critAmount * _data.Cri_to_AD_Ratio);
+
             // 레벨 관련 증가수치 추가
-            return value + (bonusAS * _data.AS_to_AD_Ratio) + (critAmount * _data.Cri_to_AD_Ratio);
+            return value + (value * (levelFactor + statFactor));
+        }
+
+        if(type == StatType.CriticalDamage)
+        {
+            return value * 0.75f;
         }
         
         return value;
@@ -52,9 +60,17 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
 
     public void OnAttack()
     {
-        CurrentAmmo--;
-
+ 
         _lastActionTime = Time.time;
+
+        bool isLastShot = (CurrentAmmo == 1);
+
+        if(isLastShot)
+        {
+            OnCriticalHit();
+        }
+
+        CurrentAmmo--;
 
         // 장전 중 탄환이 남은 상태에서 행동하면 장전 취소
         if (IsReloading && CurrentAmmo > 0)
@@ -67,6 +83,17 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
         {
             StartCoroutine(ReloadCoroutine());
         }
+    }
+
+    public void OnCriticalHit()
+    {
+        float bonusAS = _stat.GetBonusStat(StatType.AttackSpeed);
+
+        float statFactor = 0.14f + (bonusAS * _data.AS_to_SPD_Ratio);
+
+        _stat.ApplyEffect(EffectType.SpeedBuff, ModType.PercentAdd, 2f, statFactor, "Jhin_Haste");
+
+        Debug.Log("치명타 발생! 이동속도 2초간 증가");
     }
 
     private IEnumerator ReloadCoroutine()

@@ -147,14 +147,20 @@ public class UnitStat : MonoBehaviour
         _mods.RemoveAll(m => m.ID == "CurrentLevel");
 
         int amount = targetLevel - 1;
-        _mods.Add(new StatModifier("CurrentLevel", StatType.Level, ModType.Flat, amount));
+        _mods.Add(new StatModifier("CurrentLevel", StatType.Level, ModType.Flat, amount, ModifierType.Growth));
 
         Rebuild();
         Debug.Log(Current.Level);
     }
 
-    public string ApplyEffect(EffectType type, ModType mod, float duration, float value)
+    public string ApplyEffect(EffectType type, ModType mod, float duration, float value, string customID = null)
     {
+        if(!string.IsNullOrEmpty(customID) && _activeEffects.TryGetValue(customID, out Effect existingEffect))
+        {
+            existingEffect.Refresh(duration);
+            return customID;
+        }
+
         var effect = EffectFactory.Create(gameObject, type, mod, duration, value);
 
         if(effect != null)
@@ -166,7 +172,7 @@ public class UnitStat : MonoBehaviour
         return null;
     }
 
-    public string RefreshEffect(EffectType type, float duration, ModType mod, float value)
+    public string RefreshEffect(EffectType type, float duration, ModType mod, float value , string customID = null)
     {
         string effectType = GetEffetTypeName(type);
         var exist = FindEffectByType(effectType);
@@ -197,8 +203,13 @@ public class UnitStat : MonoBehaviour
 
         foreach(var mod in _mods)
         {
-
+            if(mod.Stat == type && mod.Type != ModifierType.Growth)
+            {
+                bonus += mod.Value;
+            }
         }
+
+        return bonus;
     }
 
     // 특정 타입의 모든 효과 리턴
@@ -313,11 +324,12 @@ public class UnitStat : MonoBehaviour
         ApplyEffect(EffectType.AttackBuff, ModType.PercentMul, 5f, 0.5f);
     }
 
+    // 공격속도 20% 증가
     [BoxGroup("Passive Test")]
     [Button(ButtonSizes.Medium)]
     public void TestASIncrease()
     {
-        AddModifier(new StatModifier("TestAS", StatType.AttackSpeed, ModType.PercentMul, 0.2f));
+        AddModifier(new StatModifier("TestAS", StatType.AttackSpeed, ModType.PercentMul, 0.2f, ModifierType.Passive));
 
         Rebuild();
     }

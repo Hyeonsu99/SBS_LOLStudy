@@ -7,6 +7,7 @@ public class JhinPassiveData : SkillData
 {
     public float AS_to_AD_Ratio = 0.25f;
     public float Cri_to_AD_Ratio = 0.4f;
+    public float AS_to_SPD_Ratio = 0.44f;
     public float ReloadTime = 2.5f;
     public float AutoReloadDelay = 7.5f;
 

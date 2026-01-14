@@ -26,27 +26,38 @@ public enum ModType
     PercentAdd
 }
 
+public enum ModifierType
+{
+    Growth, // 레벨업 성장
+    Item,
+    Buff,
+    Passive
+}
+
 public readonly struct StatModifier
 {
     public readonly string ID;
     public readonly StatType Stat;
     public readonly ModType Mod;
     public readonly float Value;
+    public readonly ModifierType Type;
 
-    public StatModifier(StatType stat, ModType mode, float value)
+    public StatModifier(StatType stat, ModType mode, float value, ModifierType type)
     {
         ID = null;
         Stat = stat;
         Mod = mode;
         Value = value;
+        Type = type;
     }
 
-    public StatModifier(string id, StatType stat, ModType mode, float value)
+    public StatModifier(string id, StatType stat, ModType mode, float value, ModifierType type)
     {
         ID = id;
         Stat = stat;
         Mod = mode;
         Value = value;
+        Type = type;
     }
 }
 
