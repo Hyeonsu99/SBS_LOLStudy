@@ -43,6 +43,7 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
             return value + (value * (levelFactor + statFactor));
         }
 
+        // 치명타 피해량 25% 감소 패시브
         if(type == StatType.CriticalDamage)
         {
             return value * 0.75f;
@@ -85,6 +86,7 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
         }
     }
 
+    // 치명타 시 이동속도 증가 버프
     public void OnCriticalHit()
     {
         float bonusAS = _stat.GetBonusStat(StatType.AttackSpeed);

@@ -9,6 +9,9 @@ using UnityEngine.Rendering;
 public class UnitStat : MonoBehaviour
 {
     [SerializeField] private StatData StatData;
+    [ShowInInspector] public float CurrentHP { get; private set; }
+    [ShowInInspector] public float CurrentMP { get; private set; }
+
 
     [ShowInInspector]
     private readonly List<StatModifier> _mods = new();
@@ -19,7 +22,6 @@ public class UnitStat : MonoBehaviour
 
     private readonly List<IStatTransformer> _transformers = new();
     public IStat Current { get; private set; }
-    private IStat _growthChain; // 레벨 성장치까지만 계산된 스탯
 
     [Title("Final Statistics")]
     [ShowInInspector, Sirenix.OdinInspector.ReadOnly]
@@ -61,6 +63,19 @@ public class UnitStat : MonoBehaviour
 
     private void Awake() => Rebuild();
 
+    private void Start()
+    {
+        // 현재 체력 초기화..
+        CurrentHP = Current.Get(StatType.Hp);
+        CurrentMP = Current.Get(StatType.Mp);
+    }
+
+    // HP, MP 재설정
+    // 데미지 처리..? 인터페이스..?
+    public void RestoreHP(float amount) => CurrentHP = Mathf.Min(CurrentHP + amount, Current.Get(StatType.Hp));
+    public void RestoreMP(float amount) => CurrentMP = Mathf.Min(CurrentMP + amount, Current.Get(StatType.Mp));
+    public void TakeDamage(float damage) => CurrentHP = Mathf.Max(0, CurrentHP - damage);
+
     private void LateUpdate()
     {
         _expiredEffects.Clear();
@@ -95,7 +110,6 @@ public class UnitStat : MonoBehaviour
         }
 
         result = new LevelStatDecorator(result, StatData);
-        _growthChain = result;
 
         // 아이템/버프 Modifier 추출
         var statMods = _mods.FindAll(m => m.Stat != StatType.Level);
@@ -149,8 +163,10 @@ public class UnitStat : MonoBehaviour
         int amount = targetLevel - 1;
         _mods.Add(new StatModifier("CurrentLevel", StatType.Level, ModType.Flat, amount, ModifierType.Growth));
 
+        CurrentHP += StatData.GetGrowth(StatType.Hp);
+        CurrentMP += StatData.GetGrowth(StatType.Mp);
+
         Rebuild();
-        Debug.Log(Current.Level);
     }
 
     public string ApplyEffect(EffectType type, ModType mod, float duration, float value, string customID = null)
@@ -332,5 +348,13 @@ public class UnitStat : MonoBehaviour
         AddModifier(new StatModifier("TestAS", StatType.AttackSpeed, ModType.PercentMul, 0.2f, ModifierType.Passive));
 
         Rebuild();
+    }
+
+    [BoxGroup("체젠, 마젠 적용 테스트")]
+    [Button(ButtonSizes.Medium)]
+    public void TestRegen()
+    {
+        TakeDamage(50);
+        CurrentMP -= 50f;
     }
 }

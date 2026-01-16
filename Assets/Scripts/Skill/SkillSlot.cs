@@ -39,6 +39,32 @@ public class SkillSlot : MonoBehaviour
         _data.OnEquip(_owner, _ownerStat, _level);
     }
 
+    public bool CanLevelUp(int playerLevel, int currentSkillPoint)
+    {
+        if (currentSkillPoint <= 0 || _data == null || _level >= _data.MaxLevel) return false;
+
+        // 스킬 ID 작성할 때 슬롯 이름 넣어주기로 판단
+        bool isUltimate = _data.name.Contains("R") || _data.name.Contains("Ult");
+
+        if(isUltimate)
+        {
+            if (_level == 0 && playerLevel < 6) return false;
+            if (_level == 1 && playerLevel < 11) return false;
+            if (_level == 2 && playerLevel < 16) return false;
+        }
+
+        return true;
+    }
+
+    public void RequestLevelUp(EXPHandler expHandler)
+    {
+        if(CanLevelUp(expHandler.CurrentLevel, expHandler.SkillPoint))
+        {
+            expHandler.UseSkillPoint();
+            LevelUp();
+        }
+    }
+
     public bool TryCast(GameObject target, Vector3 position)
     {
         if(!IsReady) return false;
@@ -63,5 +89,4 @@ public class SkillSlot : MonoBehaviour
             _currentCooldown -= Time.deltaTime;
         }
     }
-
 }

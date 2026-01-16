@@ -917,6 +917,8 @@ GameObject:
   - component: {fileID: 925437578}
   - component: {fileID: 925437579}
   - component: {fileID: 925437580}
+  - component: {fileID: 925437581}
+  - component: {fileID: 925437582}
   - component: {fileID: 925437576}
   m_Layer: 7
   m_Name: Player
@@ -1174,6 +1176,34 @@ MonoBehaviour:
   Slot_W: {fileID: 1876378612}
   Slot_E: {fileID: 367210344}
   Slot_R: {fileID: 807876938}
+--- !u!114 &925437581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925437565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6652b067622670d4cbe665d3e63192b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RegenHandler
+--- !u!114 &925437582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925437565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5791f93d55a6a5449854d9e010de1662, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EXPHandler
+  CurrentLevel: 1
+  CurrentExp: 0
+  SkillPoint: 0
+  _expTable: 0
 --- !u!1 &1110983977
 GameObject:
   m_ObjectHideFlags: 0

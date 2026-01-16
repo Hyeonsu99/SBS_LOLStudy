@@ -3,24 +3,42 @@ using UnityEngine.AI;
 
 public class PlayerMovement : MonoBehaviour, IUnitMovement
 {
-    public bool IsArrived(NavMeshAgent agent, float epsilon = 0.05F)
+    private UnitStat _stat;
+    private NavMeshAgent _agent;
+
+
+    private void Awake()
+    {
+        _stat = GetComponent<UnitStat>();
+        _agent = GetComponent<NavMeshAgent>();
+    }
+
+    public bool IsArrived(float epsilon = 0.05F)
     {
         return true;
     }
 
-    public bool IsMoving(NavMeshAgent agent)
+    public bool IsMoving()
     {
         return true;
     }
 
-    public void Move(NavMeshAgent agent, Vector3 position)
+    private void Update()
     {
-        agent.SetDestination(position);
+        if(_stat != null && _agent != null)
+        {
+            _agent.speed = _stat.Current.Get(StatType.MoveSpeed) / 100f;
+        }
     }
 
-    public void Stop(NavMeshAgent agent)
+    public void Move(Vector3 position)
     {
-       agent.velocity = Vector3.zero;
-       agent.ResetPath();
+        _agent.SetDestination(position);
+    }
+
+    public void Stop()
+    {
+       _agent.velocity = Vector3.zero;
+       _agent.ResetPath();
     }
 }

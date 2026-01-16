@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                _movement?.Move(_agent, _combatHandler.GetTargetPosition());
+                _movement?.Move(_combatHandler.GetTargetPosition());
             }
         }
     }
@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour
             _combatHandler.ClearTarget();
             if (_positionValidator.IsValidMovePosition(ctx.position, ctx.target.layer))
             {
-                _movement?.Move(_agent, ctx.position);
+                _movement?.Move(ctx.position);
             }
         }
     }
