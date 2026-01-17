@@ -1,8 +1,9 @@
 using System.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstraint
+public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstraint, IAttackProvider
 {
     private JhinPassiveData _data;
     private UnitStat _stat;
@@ -24,6 +25,11 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
         _data = data;
         _stat = stat;
         _stat.AddTransformer(this);
+
+        if(TryGetComponent(out CombatHandler combat))
+        {
+            combat.OnHitUpdate += (info) => { if (info.isCritical) OnCriticalHit(); };
+        }
     }
 
     public float Transform(StatType type, float value, IStat baseStat, IStat chain)
@@ -52,24 +58,27 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
         return value;
     }
 
-    public bool CanAttack()
+    public void DecorateDamage(ref DamageInfo info, UnitStat attacker, UnitStat target)
     {
-        if (CurrentAmmo <= 0 && IsReloading) return false;
+        if(CurrentAmmo == 1)
+        {
+            info.isCritical = true;
 
-        return true;
+            float maxHp = target.Current.Get(StatType.Hp);
+            float currentHp = target.CurrentHP;
+            float missingHp = maxHp - currentHp;
+
+            float level = attacker.Current.Get(StatType.Level);
+            float percent = Mathf.Lerp(0.15f, 0.24f, (Mathf.Clamp(level, 1, 18) - 1) / 17f);
+
+            info.BonusDamage += missingHp * percent;
+        }
     }
 
     public void OnAttack()
     {
- 
+
         _lastActionTime = Time.time;
-
-        bool isLastShot = (CurrentAmmo == 1);
-
-        if(isLastShot)
-        {
-            OnCriticalHit();
-        }
 
         CurrentAmmo--;
 
@@ -105,4 +114,6 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
         CurrentAmmo = 4;
         IsReloading = false;
     }
+
+    public bool CanAttack() => !(CurrentAmmo <= 0 && IsReloading);
 }

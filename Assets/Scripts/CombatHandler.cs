@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CombatHandler : MonoBehaviour
@@ -7,15 +9,19 @@ public class CombatHandler : MonoBehaviour
     private TargetValidator _targetValidator;
     private GameObject _currentTarget;
 
-    private IAttackConstraint _attackConstraint;
     private float _lastAttackTime;
 
     private List<IAttackConstraint> _constraints = new();
+    private List<IAttackProvider> _damageProviders = new();
+
+    public Action<DamageInfo> OnHitUpdate;
 
     private void Awake()
     {
         _unitStat = GetComponent<UnitStat>();
         _targetValidator = GetComponent<TargetValidator>();
+
+        _damageProviders.AddRange(GetComponents<IAttackProvider>());
     }
 
     public void RegisterConstraint(IAttackConstraint constraint)
@@ -29,10 +35,16 @@ public class CombatHandler : MonoBehaviour
         _constraints.Remove(constraint);
     }
 
-    public void SetTarget(GameObject target) => _currentTarget = target;
-    public void ClearTarget() => _currentTarget = null;
-    public bool HasTarget() => _currentTarget != null;
-    public Vector3 GetTargetPosition() => _currentTarget != null ? _currentTarget.transform.position : transform.position;  
+    public void RegisterProvider(IAttackProvider provider)
+    {
+        if (!_damageProviders.Contains(provider))
+            _damageProviders.Add(provider);
+    }
+
+    public void UnregisterProvider(IAttackProvider provider)
+    {
+        _damageProviders.Remove(provider);
+    }
 
     public bool IsTargetValid()
     {
@@ -63,11 +75,7 @@ public class CombatHandler : MonoBehaviour
     {
         foreach(var constraint in _constraints)
         {
-            if(!constraint.CanAttack())
-            {
-                Debug.Log("공격 제약 조건에 의해 차단됨");
-                return;
-            }
+            if (!constraint.CanAttack()) return;
         }
 
         // 공격 쿨타임 갱신 처리
@@ -75,13 +83,48 @@ public class CombatHandler : MonoBehaviour
 
         if(Time.time > _lastAttackTime + attackCooldown)
         {
-            Debug.Log($"{_currentTarget.name}에게 공격 성공!");
             _lastAttackTime = Time.time;
 
-            foreach(var constraint in _constraints)
+            if (!_currentTarget.TryGetComponent(out UnitStat targetStat)) return;
+
+            DamageInfo info = new DamageInfo
+            {
+                Attacker = gameObject,
+                Target = _currentTarget,
+                RawDamage = _unitStat.Current.Get(StatType.AttackDamage),
+                BonusDamage = 0,
+                Type = DamageType.Physical,
+                isCritical = IsCritical()
+            };
+
+            foreach(var provider in _damageProviders)
+            {
+                provider.DecorateDamage(ref info, _unitStat, targetStat);
+            }
+
+            float finalDamage = DamageCalculater.CalculateFinalDamage(_unitStat, targetStat, info);
+            targetStat.TakeDamage(finalDamage, gameObject);
+
+            Debug.Log($"기본 공격! 데미지 : {finalDamage}");
+
+            foreach (var constraint in _constraints)
             {
                 constraint.OnAttack();
             }
+
+            OnHitUpdate?.Invoke(info);
         }
     }
+
+    private bool IsCritical()
+    {
+        float change = _unitStat.Current.Get(StatType.CriticalAmount);
+        return UnityEngine.Random.Range(0f, 100f) < change;
+    }
+
+    public void SetTarget(GameObject target) => _currentTarget = target;
+    public void ClearTarget() => _currentTarget = null;
+    public bool HasTarget() => _currentTarget != null;
+    public Vector3 GetTargetPosition() => _currentTarget != null ? _currentTarget.transform.position : transform.position;
+
 }

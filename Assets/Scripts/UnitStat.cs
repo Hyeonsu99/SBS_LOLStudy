@@ -2,6 +2,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -17,10 +18,9 @@ public class UnitStat : MonoBehaviour
     private readonly List<StatModifier> _mods = new();
 
     private Dictionary<string, Effect> _activeEffects = new();
-
     private List<string> _expiredEffects = new();
-
     private readonly List<IStatTransformer> _transformers = new();
+
     public IStat Current { get; private set; }
 
     [Title("Final Statistics")]
@@ -61,36 +61,53 @@ public class UnitStat : MonoBehaviour
         }
     }
 
-    private void Awake() => Rebuild();
-
-    private void Start()
+    private void Awake()
     {
+        Rebuild();
+
         // 현재 체력 초기화..
         CurrentHP = Current.Get(StatType.Hp);
         CurrentMP = Current.Get(StatType.Mp);
+    }
+
+    private void LateUpdate()
+    {
+        _expiredEffects.Clear();
+
+        foreach (var kvp in _activeEffects)
+        {
+            if (kvp.Value == null || kvp.Value.IsExpired)
+            {
+                _expiredEffects.Add(kvp.Key);
+            }
+        }
+
+        foreach (var effectId in _expiredEffects)
+        {
+            _activeEffects.Remove(effectId);
+        }
     }
 
     // HP, MP 재설정
     // 데미지 처리..? 인터페이스..?
     public void RestoreHP(float amount) => CurrentHP = Mathf.Min(CurrentHP + amount, Current.Get(StatType.Hp));
     public void RestoreMP(float amount) => CurrentMP = Mathf.Min(CurrentMP + amount, Current.Get(StatType.Mp));
-    public void TakeDamage(float damage) => CurrentHP = Mathf.Max(0, CurrentHP - damage);
-
-    private void LateUpdate()
+    public void TakeDamage(float damage, GameObject attacker)
     {
-        _expiredEffects.Clear();
+        CurrentHP = Mathf.Max(0, CurrentHP - damage);
 
-        foreach(var kvp in _activeEffects)
+        if(CurrentHP <= 0)
         {
-            if(kvp.Value == null || kvp.Value.IsExpired)
-            {
-                _expiredEffects.Add(kvp.Key);
-            }
+            Die(attacker);
         }
+    }
 
-        foreach(var effectId in _expiredEffects)
+    private void Die(GameObject killer)
+    {
+        var expHandler = killer.GetComponent<EXPHandler>();
+        if(expHandler != null)
         {
-            _activeEffects.Remove(effectId);
+            expHandler.AddExp(100f);
         }
     }
 
@@ -99,16 +116,16 @@ public class UnitStat : MonoBehaviour
         if (StatData == null) return;
 
         IStat baseEntity = new StatEntity(StatData);
-
         IStat result = baseEntity;
 
-        // 레벨 및 성장 적용
+        // 레벨 Modifier 적용
         foreach(var mod in _mods)
         {
             if(mod.Stat == StatType.Level)
                 result = new StatDecorator(result, mod, baseEntity);
         }
 
+        // 레벨당 성장 적용
         result = new LevelStatDecorator(result, StatData);
 
         // 아이템/버프 Modifier 추출
@@ -158,15 +175,21 @@ public class UnitStat : MonoBehaviour
 
     public void UpdateLevel(int targetLevel)
     {
+        float maxHpBefore = Current.Get(StatType.Hp);
+        float maxMpBefore = Current.Get(StatType.Mp);
+
+        float hpPercent = (maxHpBefore > 0) ? CurrentHP / maxHpBefore : 1f;
+        float mpPercent = (maxMpBefore > 0) ? CurrentMP / maxMpBefore : 1f;
+
         _mods.RemoveAll(m => m.ID == "CurrentLevel");
 
         int amount = targetLevel - 1;
         _mods.Add(new StatModifier("CurrentLevel", StatType.Level, ModType.Flat, amount, ModifierType.Growth));
 
-        CurrentHP += StatData.GetGrowth(StatType.Hp);
-        CurrentMP += StatData.GetGrowth(StatType.Mp);
-
         Rebuild();
+
+        CurrentHP = Current.Get(StatType.Hp) * hpPercent;
+        CurrentMP = Current.Get(StatType.Mp) * mpPercent;
     }
 
     public string ApplyEffect(EffectType type, ModType mod, float duration, float value, string customID = null)
@@ -354,7 +377,7 @@ public class UnitStat : MonoBehaviour
     [Button(ButtonSizes.Medium)]
     public void TestRegen()
     {
-        TakeDamage(50);
+        TakeDamage(50, gameObject);
         CurrentMP -= 50f;
     }
 }

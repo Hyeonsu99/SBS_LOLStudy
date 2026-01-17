@@ -19,6 +19,8 @@ public class JhinPassiveData : SkillData
         var combat = owner.GetComponent<CombatHandler>();
         combat.RegisterConstraint(handler);
 
+        combat.RegisterProvider(handler);
+
         base.OnEquip(owner, stat, level);
     }
 
