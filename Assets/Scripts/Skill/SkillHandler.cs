@@ -33,4 +33,27 @@ public class SkillHandler : MonoBehaviour
         if (slot != null && data != null)
             slot.Initialize(data, gameObject, _stat);
     }
+
+    public SkillSlot GetSKillSlot(SkillCommand cmd)
+    {
+        return cmd switch
+        {
+            SkillCommand.Q => Slot_Q,
+            SkillCommand.W => Slot_W,
+            SkillCommand.E => Slot_E,
+            SkillCommand.R => Slot_R,
+            _ => null
+        };
+    }
+
+    public void Execute(InputContext ctx)
+    {
+        switch (ctx.skillCommand)
+        {
+            case SkillCommand.Q:
+                Slot_Q.TryCast(ctx.target, ctx.target.transform.position);
+                break;
+        }
+
+    }
 }

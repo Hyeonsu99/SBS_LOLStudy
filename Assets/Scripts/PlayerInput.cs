@@ -21,7 +21,7 @@ public class PlayerInput : MonoBehaviour
         {
             if (Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
             {
-                Enqueue(PlayerAction.CastSkill, new InputContext { position = hit.point, target = hit.transform.gameObject, skillCommand = SkillCommand.Q });
+                Enqueue(PlayerAction.CastSkill, new InputContext { position = hit.point, target = hit.transform.gameObject == null ? HoverTarget : hit.transform.gameObject, skillCommand = SkillCommand.Q });
             }
         }
 

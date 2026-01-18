@@ -31,6 +31,12 @@ public class SkillSlot : MonoBehaviour
         }
     }
 
+    public float GetRange()
+    {
+        if (_data == null) return 0f;
+        return _data.GetRange(_level);
+    }
+
     public void LevelUp()
     {
         if(_data == null || _level >= _data.MaxLevel) return;
@@ -70,11 +76,13 @@ public class SkillSlot : MonoBehaviour
         if(!IsReady) return false;
 
         float cost = _data.GetCost(_level);
-        float currentMp = _ownerStat.Current.Get(StatType.Mp);
+        float currentMp = _ownerStat.CurrentMP;
 
         if (currentMp < cost) return false;
 
         // 마나 소모 로직 추가
+        _ownerStat.RestoreMP(-cost);
+
         _data.Execute(_owner, target, position, _level);
         _currentCooldown = _data.GetCooldown(_level);
         

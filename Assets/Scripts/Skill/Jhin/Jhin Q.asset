@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 864de3075cfcbac4f95cd2e1e89a30bf, type: 3}
+  m_Name: Jhin Q
+  m_EditorClassIdentifier: Assembly-CSharp::JhinQData
+  SkillId: 
+  SkillName: 
+  Icon: {fileID: 0}
+  Description: 
+  Type_Target: 5
+  Type_Delivery: 2
+  MaxLevel: 5
+  Costs:
+  - 40
+  - 45
+  - 50
+  - 55
+  - 60
+  Cooldowns:
+  - 7
+  - 6.5
+  - 6
+  - 5.5
+  - 5
+  Ranges:
+  - 550
+  - 550
+  - 550
+  - 550
+  - 550
+  Radius: 0
+  BaseDamages:
+  - 44
+  - 69
+  - 94
+  - 119
+  - 144
+  AdRatios:
+  - 0.44
+  - 0.515
+  - 0.59
+  - 0.665
+  - 0.74
+  ApRatio: 0.6
+  BounceRange: 4
+  KillBouns: 0.35
+  MaxBounces: 4
+  ProjectilePrefab: {fileID: 8841899945707824585, guid: 61e4c478ddb23f643ab16695c0262f28, type: 3}

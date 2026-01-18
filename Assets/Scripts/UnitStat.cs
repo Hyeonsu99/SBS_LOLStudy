@@ -23,6 +23,8 @@ public class UnitStat : MonoBehaviour
 
     public IStat Current { get; private set; }
 
+    public Action<GameObject> OnDeath;
+
     [Title("Final Statistics")]
     [ShowInInspector, Sirenix.OdinInspector.ReadOnly]
     private Dictionary<StatType, float> _finalStat
@@ -90,8 +92,18 @@ public class UnitStat : MonoBehaviour
 
     // HP, MP 재설정
     // 데미지 처리..? 인터페이스..?
-    public void RestoreHP(float amount) => CurrentHP = Mathf.Min(CurrentHP + amount, Current.Get(StatType.Hp));
-    public void RestoreMP(float amount) => CurrentMP = Mathf.Min(CurrentMP + amount, Current.Get(StatType.Mp));
+    public void RestoreHP(float amount)
+    {
+        float maxHp = Current.Get(StatType.Hp);
+        CurrentHP = Mathf.Clamp(CurrentHP + amount, 0, maxHp);
+    }
+
+    public void RestoreMP(float amount)
+    {
+        float maxMp = Current.Get(StatType.Mp);
+        CurrentMP = Mathf.Clamp(CurrentMP + amount, 0, maxMp);
+    }
+
     public void TakeDamage(float damage, GameObject attacker)
     {
         CurrentHP = Mathf.Max(0, CurrentHP - damage);
@@ -104,10 +116,21 @@ public class UnitStat : MonoBehaviour
 
     private void Die(GameObject killer)
     {
-        var expHandler = killer.GetComponent<EXPHandler>();
-        if(expHandler != null)
+        OnDeath?.Invoke(killer);
+
+        if(killer != null)
         {
-            expHandler.AddExp(100f);
+            DistributeExp(killer);
+        }
+    }
+
+    private void DistributeExp(GameObject killer)
+    {
+        // 경험치 공유나 그래프는 일단 제외
+        if (killer.TryGetComponent(out EXPHandler expHandler))
+        {
+            float rewardExp = Current.Get(StatType.Level) * 50f;
+            expHandler.AddExp(rewardExp);
         }
     }
 

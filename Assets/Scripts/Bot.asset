@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bot
   m_EditorClassIdentifier: Assembly-CSharp::StatData
   Level: 1
-  Hp: 10000
+  Hp: 10
   HpRegen: 0
   Mp: 0
   MpRegen: 0
