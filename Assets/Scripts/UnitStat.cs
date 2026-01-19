@@ -320,6 +320,19 @@ public class UnitStat : MonoBehaviour
         _activeEffects.Clear();
     }
 
+    public bool HasEffect(EffectType type)
+    {
+        string typeName = type.ToString();
+
+        foreach(var effect in _activeEffects.Values)
+        {
+            if(effect != null && !effect.IsExpired && effect.EffectType == typeName)
+                return true;
+        }
+
+        return false;
+    }
+
     // 특정 타입의 효과 찾기
     private Effect FindEffectByType(string effectType)
     {

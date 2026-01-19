@@ -10,9 +10,15 @@ public enum EffectType
     AbilityPowerBuff,
     // 버프 타입 쭉 추가
 
+    // 스탯 관련 디버프
     SlowDebuff,
-    ArmorDebuff
-    // 디버프 타입 쭉 추가
+    ArmorDebuff,
+    
+    // 특정 챔피언의 디버프
+    JhinMark,
+
+    // CC기 타입
+    Root
 }
 
 public static class EffectFactory
@@ -39,6 +45,11 @@ public static class EffectFactory
                 speedBuff.Initialize(stat, duration, mod, value);
                 effect = speedBuff;
                 break;
+            case EffectType.JhinMark:
+                break;
+            case EffectType.Root:
+                break;
+            
         }
 
         return effect;

@@ -62,13 +62,25 @@ public class JhinQProjectile : MonoBehaviour
             float multiplier = 1f + (_killCount * _data.KillBouns);
             float finalDamage = currentDamage * multiplier;
 
-            Debug.Log($"Final Damage {finalDamage}");
+            
 
             if(target.TryGetComponent(out UnitStat targetStat))
             {
                 //float beforeHp = targetStat.CurrentHP;
 
-                targetStat.TakeDamage(finalDamage, _owner);
+                DamageInfo info = new DamageInfo
+                {
+                    RawDamage = finalDamage,
+                    BonusDamage = 0,
+                    Attacker = _owner,
+                    Target = target,
+                    Type = DamageType.Physical
+                };
+
+                float calDamage = DamageCalculater.CalculateFinalDamage(_ownerStat, targetStat, info);
+                Debug.Log($"Final Damage {calDamage}");
+
+                targetStat.TakeDamage(calDamage, _owner);
 
                 if(targetStat.CurrentHP <= 0)
                 {

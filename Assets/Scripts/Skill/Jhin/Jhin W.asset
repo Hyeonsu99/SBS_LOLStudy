@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cefdf834087b6743874febe7c8ed40e, type: 3}
+  m_Name: Jhin W
+  m_EditorClassIdentifier: Assembly-CSharp::JhinWData
+  SkillId: 
+  SkillName: 
+  Icon: {fileID: 0}
+  Description: 
+  Type_Target: 5
+  Type_Delivery: 2
+  MaxLevel: 5
+  Costs:
+  - 50
+  - 55
+  - 60
+  - 65
+  - 70
+  Cooldowns:
+  - 12
+  - 12
+  - 12
+  - 12
+  - 12
+  Ranges:
+  - 3000
+  - 3000
+  - 3000
+  - 3000
+  - 3000
+  Radius: 0
+  BaseDamages:
+  - 70
+  - 105
+  - 140
+  - 175
+  - 210
+  AdRatio: 0.5
+  MinionDamageRatio: 0.75
+  RootDurations:
+  - 1.25
+  - 1.5
+  - 1.75
+  - 2
+  - 2.25
+  MarkDuration: 4
+  ProjectileSpeed: 50
+  MaxDistance: 3000
+  ProjectilePrefab: {fileID: 8841899945707824585, guid: b442ced55aea4fd40bf0ac286e62ac38, type: 3}

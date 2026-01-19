@@ -16,6 +16,8 @@ public class SkillSlot : MonoBehaviour
     // 남은 쿨타임 비율
     public float CooldownRatio => _data != null ? _currentCooldown / _data.GetCooldown(_level) : 0f;
 
+    public float CurrentCooldown => _currentCooldown;
+
     public void Initialize(SkillData newData, GameObject owner, UnitStat stat)
     {
         _data = newData;

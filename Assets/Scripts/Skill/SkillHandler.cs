@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SkillHandler : MonoBehaviour
@@ -52,6 +53,9 @@ public class SkillHandler : MonoBehaviour
         {
             case SkillCommand.Q:
                 Slot_Q.TryCast(ctx.target, ctx.target.transform.position);
+                break;
+            case SkillCommand.W:
+                Slot_W.TryCast(ctx.target, ctx.direction);
                 break;
         }
 

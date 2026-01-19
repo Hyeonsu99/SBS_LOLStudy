@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChampionData
   Passive: {fileID: 11400000, guid: eeff50e2734b80247bffe0893f7d3723, type: 2}
   Q: {fileID: 11400000, guid: 50892a75964efec478ed20d47ff3df0d, type: 2}
-  W: {fileID: 0}
+  W: {fileID: 11400000, guid: db8684bbb66a2f8489995f69ba30acbd, type: 2}
   E: {fileID: 0}
   R: {fileID: 0}

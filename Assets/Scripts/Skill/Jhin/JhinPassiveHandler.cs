@@ -69,7 +69,7 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
             float missingHp = maxHp - currentHp;
 
             float level = attacker.Current.Get(StatType.Level);
-            float percent = Mathf.Lerp(0.15f, 0.24f, (Mathf.Clamp(level, 1, 18) - 1) / 17f);
+            float percent = Mathf.Lerp(0.15f, 0.25f, (Mathf.Clamp(level, 1, 18) - 1) / 17f);
 
             info.BonusDamage += missingHp * percent;
         }
