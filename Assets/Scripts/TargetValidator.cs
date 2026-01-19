@@ -15,12 +15,6 @@ public class TargetValidator : MonoBehaviour
         if(!identity.IsAlive)
             return false;
 
-        if(!identity.IsTargetable)
-            return false;
-
-        if (!IsEnemy(identity))
-            return false;
-
         return true;
     }
 
@@ -29,10 +23,5 @@ public class TargetValidator : MonoBehaviour
         identity = null;
 
         return obj != null && obj.TryGetComponent(out identity);
-    }
-
-    private bool IsEnemy(UnitIdentity identity)
-    {
-        return identity.ID != ID;
     }
 }

@@ -10,20 +10,18 @@ using UnityEngine.Rendering;
 public class UnitStat : MonoBehaviour
 {
     [SerializeField] private StatData StatData;
-    [ShowInInspector] public float CurrentHP { get; private set; }
-    [ShowInInspector] public float CurrentMP { get; private set; }
-
-
-    [ShowInInspector]
-    private readonly List<StatModifier> _mods = new();
-
-    private Dictionary<string, Effect> _activeEffects = new();
-    private List<string> _expiredEffects = new();
-    private readonly List<IStatTransformer> _transformers = new();
 
     public IStat Current { get; private set; }
+    public float CurrentHP { get; private set; }
+    public float CurrentMP { get; private set; }
 
-    public Action<GameObject> OnDeath;
+    private readonly List<StatModifier> _mods = new();
+    private readonly Dictionary<string, Effect> _activeEffects = new();
+    private readonly List<IStatTransformer> _transformers = new();
+
+    public event Action<float, GameObject, bool> OnTakeDamage;
+    public event Action<GameObject> OnDeath;
+    public event Action OnStatChanged;
 
     [Title("Final Statistics")]
     [ShowInInspector, Sirenix.OdinInspector.ReadOnly]
@@ -66,7 +64,6 @@ public class UnitStat : MonoBehaviour
     private void Awake()
     {
         Rebuild();
-
         // 현재 체력 초기화..
         CurrentHP = Current.Get(StatType.Hp);
         CurrentMP = Current.Get(StatType.Mp);
@@ -74,24 +71,27 @@ public class UnitStat : MonoBehaviour
 
     private void LateUpdate()
     {
-        _expiredEffects.Clear();
+        UpdateExpiredEffects();
+    }
 
-        foreach (var kvp in _activeEffects)
+    private void UpdateExpiredEffects()
+    {
+        if (_activeEffects.Count == 0) return;
+
+        var expiredKey = new List<string>();
+
+        foreach(var kvp in _activeEffects)
         {
-            if (kvp.Value == null || kvp.Value.IsExpired)
-            {
-                _expiredEffects.Add(kvp.Key);
-            }
+            if(kvp.Value == null || kvp.Value.IsExpired)
+                expiredKey.Add(kvp.Key);
         }
 
-        foreach (var effectId in _expiredEffects)
+        foreach(var key in expiredKey)
         {
-            _activeEffects.Remove(effectId);
+            _activeEffects.Remove(key);
         }
     }
 
-    // HP, MP 재설정
-    // 데미지 처리..? 인터페이스..?
     public void RestoreHP(float amount)
     {
         float maxHp = Current.Get(StatType.Hp);
@@ -151,9 +151,6 @@ public class UnitStat : MonoBehaviour
         // 레벨당 성장 적용
         result = new LevelStatDecorator(result, StatData);
 
-        // 아이템/버프 Modifier 추출
-        var statMods = _mods.FindAll(m => m.Stat != StatType.Level);
-
         // 계산 우선 순위 사용
         ModType[] priorityOrder =
         {
@@ -164,9 +161,12 @@ public class UnitStat : MonoBehaviour
 
         foreach (ModType modType in priorityOrder)
         {
-            foreach (var mod in statMods.FindAll(m => m.Mod == modType))
+            foreach (var mod in _mods)
             {
-                result = new StatDecorator(result, mod, baseEntity);
+                if(mod.Stat != StatType.Level && mod.Mod == modType)
+                {
+                    result = new StatDecorator(result, mod, baseEntity);
+                }           
             }
         }
 
@@ -177,20 +177,13 @@ public class UnitStat : MonoBehaviour
         }
 
         Current = result;
+
+        OnStatChanged?.Invoke();
     }
 
-    public void AddModifier(StatModifier modifier)
-    {
-        _mods.Add(modifier);
-        Rebuild();
-    }
+    public void AddModifier(StatModifier modifier) { _mods.Add(modifier); Rebuild(); }
 
-    // 
-    public void RemoveModifier(StatModifier modifier)
-    {
-        _mods.RemoveAll(m => m.ID == modifier.ID);
-        Rebuild();
-    }
+    public void RemoveModifier(StatModifier modifier) { _mods.RemoveAll(m => m.ID == modifier.ID); Rebuild(); }
 
     public void AddTransformer(IStatTransformer transformer) { _transformers.Add(transformer); Rebuild(); }
 
@@ -272,52 +265,6 @@ public class UnitStat : MonoBehaviour
         }
 
         return bonus;
-    }
-
-    // 특정 타입의 모든 효과 리턴
-    public List<Effect> GetEffectsByType(string effectType)
-    {
-        List<Effect> results = new List<Effect>();
-
-        foreach(var effect in _activeEffects.Values)
-        {
-            if (effect != null && effect.EffectType == effectType && !effect.IsExpired)
-            {
-                results.Add(effect);
-            }
-        }
-
-        return results;
-    }
-
-    // 특정 타입의 모든 효과 제거
-    public void RemoveEffectsByType(string effectType)
-    {
-        List<string> toRemove = new();
-
-        foreach(var kvp in _activeEffects)
-        {
-            toRemove.Add(kvp.Key);
-        }
-
-        foreach(var id in toRemove)
-        {
-            RemoveEffect(id);
-        }
-    }
-
-    // 모든 효과 제거
-    public void ClearEffect()
-    {
-        foreach(var effect in _activeEffects.Values)
-        {
-            if(effect != null)
-            {
-                Destroy(effect);
-            }
-        }
-
-        _activeEffects.Clear();
     }
 
     public bool HasEffect(EffectType type)

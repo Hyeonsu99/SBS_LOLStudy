@@ -1,16 +1,9 @@
 using UnityEngine;
 
-public class IDamageable : MonoBehaviour
+// 데미지를 입을 수 있는 모든 존재
+public interface IDamageable
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    bool IsDead { get; }
+    void TakeDamage(float damage, GameObject attacker);
+    UnitStat Stat { get; }
 }

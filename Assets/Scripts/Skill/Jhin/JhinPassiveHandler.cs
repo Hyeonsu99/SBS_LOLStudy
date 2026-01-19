@@ -32,7 +32,7 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
         }
     }
 
-    public float Transform(StatType type, float value, IStat baseStat, IStat chain)
+    public float Transform(StatType type, float value, IStat baseStat)
     {
         if(type == StatType.AttackSpeed) return baseStat.Get(StatType.AttackSpeed);
 
@@ -77,7 +77,6 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
 
     public void OnAttack()
     {
-
         _lastActionTime = Time.time;
 
         CurrentAmmo--;

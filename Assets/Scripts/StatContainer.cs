@@ -137,7 +137,7 @@ public class TransformStatDecorator : IStat
 
         foreach(var transfomer in _transformers)
         {
-            value = transfomer.Transform(type, value, _baseStat, _wrapped);
+            value = transfomer.Transform(type, value, _baseStat);
         }
 
         return value;

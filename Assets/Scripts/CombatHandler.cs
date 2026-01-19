@@ -7,21 +7,31 @@ public class CombatHandler : MonoBehaviour
 {
     private UnitStat _unitStat;
     private TargetValidator _targetValidator;
+    private UnitIdentity _myIdentity;
+
+    private float _rangeBuffer = 0.1f;
+    private const float RANGE_UNIT_SCALE = 100f;
+
     private GameObject _currentTarget;
+    private UnitStat _targetStat;
+    private UnitIdentity _targetIdentity;
 
     private float _lastAttackTime;
 
     private List<IAttackConstraint> _constraints = new();
     private List<IAttackProvider> _damageProviders = new();
 
-    public Action<DamageInfo> OnHitUpdate;
+    public event Action<DamageInfo> OnHitUpdate;
+    public event Action OnAttackPerformed;
 
     private void Awake()
     {
         _unitStat = GetComponent<UnitStat>();
         _targetValidator = GetComponent<TargetValidator>();
+        _myIdentity = GetComponent<UnitIdentity>();
 
         _damageProviders.AddRange(GetComponents<IAttackProvider>());
+        _constraints.AddRange(GetComponents<IAttackConstraint>());
     }
 
     public void RegisterConstraint(IAttackConstraint constraint)
@@ -48,7 +58,7 @@ public class CombatHandler : MonoBehaviour
 
     public bool IsTargetValid()
     {
-        if(_currentTarget == null) return false;
+        if(_currentTarget == null || _targetStat == null) return false;
 
         return _targetValidator.IsValidTargetForBasicAttack(_currentTarget);
     }
