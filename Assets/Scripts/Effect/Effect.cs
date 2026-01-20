@@ -3,7 +3,8 @@ using UnityEngine;
 public abstract class Effect : MonoBehaviour
 {
     public string EffectID { get; protected set; }
-    public string EffectType { get; protected set; }
+    public EffectType Type { get; protected set; }
+
     public float Duration;
     public float RemainTime { get; protected set; }
     public bool IsExpired => RemainTime <= 0f;
@@ -11,13 +12,14 @@ public abstract class Effect : MonoBehaviour
     protected UnitStat targetStat;
     protected StatModifier modifier;
 
-    public virtual void Initialize(UnitStat stat, float duration, string customID = null)
+    public virtual void Initialize(UnitStat stat, float duration, EffectType type, string customID = null)
     {
         targetStat = stat;
         Duration = duration;
         RemainTime = duration;
+        Type = type;
 
-        EffectID = string.IsNullOrEmpty(customID) ? $"{EffectType}_{Time.time}_{Random.Range(1000, 9999)}" : customID;
+        EffectID = string.IsNullOrEmpty(customID) ? $"{Type}_{Time.time}_{Random.Range(1000, 9999)}" : customID;
 
         Apply();
     }

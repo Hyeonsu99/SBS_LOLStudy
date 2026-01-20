@@ -6,12 +6,11 @@ public class SpeedBuff : Effect
     private float speedBonus;
     private ModType modType;
 
-    public void Initialize(UnitStat target , float duration, ModType mod, float speedBonus)
+    public void Initialize(UnitStat target , float duration, ModType mod, float speedBonus, EffectType type)
     {
         this.speedBonus = speedBonus;
-        EffectType = StringValue.SpeedBuff;
         modType = mod;
-        base.Initialize(target, duration);
+        base.Initialize(target, duration, type);
     }
 
     protected override void Apply()

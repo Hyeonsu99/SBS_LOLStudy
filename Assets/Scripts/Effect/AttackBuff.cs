@@ -5,12 +5,11 @@ public class AttackBuff : Effect
     private float attackBouns;
     private ModType modType;
 
-    public void Initialize(UnitStat target, float duration, ModType mod, float attackBouns)
+    public void Initialize(UnitStat target, float duration, ModType mod, float attackBouns, EffectType type)
     {
         this.attackBouns = attackBouns;
-        EffectType = StringValue.AttackBuff;
         modType = mod;
-        base.Initialize(target, duration);
+        base.Initialize(target, duration, type);
     }
 
     protected override void Apply()

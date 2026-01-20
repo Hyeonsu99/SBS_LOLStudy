@@ -17,7 +17,8 @@ MonoBehaviour:
   Icon: {fileID: 0}
   Description: 
   Type_Target: 0
-  Type_Delivery: 0
+  Type_Delivery: 4
+  TargetMask: 15
   MaxLevel: 5
   Costs: []
   Cooldowns: []
@@ -25,5 +26,6 @@ MonoBehaviour:
   Radius: 0
   AS_to_AD_Ratio: 0.25
   Cri_to_AD_Ratio: 0.4
+  AS_to_SPD_Ratio: 0.44
   ReloadTime: 2.5
   AutoReloadDelay: 7.5

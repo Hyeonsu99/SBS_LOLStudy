@@ -4,7 +4,7 @@ public class RootDebuff : Effect
 {
     private void Awake()
     {
-        EffectType = "Root";
+        Type = EffectType.Root;
     }
 
     protected override void Apply()

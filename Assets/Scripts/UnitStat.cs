@@ -53,7 +53,7 @@ public class UnitStat : MonoBehaviour
             {
                 if(effect != null && !effect.IsExpired)
                 {
-                    list.Add($"{effect.EffectType} ({effect.RemainTime:F1}s)");
+                    list.Add($"{effect.EffectID} ({effect.RemainTime:F1}s)");
                 }
             }
 
@@ -216,6 +216,13 @@ public class UnitStat : MonoBehaviour
             return customID;
         }
 
+        var exist = FindEffectByType(type);
+        if(exist != null && string.IsNullOrEmpty(customID))
+        {
+            exist.Refresh(duration);
+            return exist.EffectID;
+        }
+
         var effect = EffectFactory.Create(gameObject, type, mod, duration, value);
 
         if(effect != null)
@@ -225,22 +232,6 @@ public class UnitStat : MonoBehaviour
         }
 
         return null;
-    }
-
-    public string RefreshEffect(EffectType type, float duration, ModType mod, float value , string customID = null)
-    {
-        string effectType = GetEffetTypeName(type);
-        var exist = FindEffectByType(effectType);
-
-        if(exist != null)
-        {
-            exist.Refresh(duration);
-            return effectType;
-        }
-        else
-        {
-            return ApplyEffect(type, mod, duration, value);
-        }
     }
 
     public void RemoveEffect(string id)
@@ -269,11 +260,9 @@ public class UnitStat : MonoBehaviour
 
     public bool HasEffect(EffectType type)
     {
-        string typeName = type.ToString();
-
         foreach(var effect in _activeEffects.Values)
         {
-            if(effect != null && !effect.IsExpired && effect.EffectType == typeName)
+            if(effect != null && !effect.IsExpired && effect.Type == type)
                 return true;
         }
 
@@ -281,11 +270,11 @@ public class UnitStat : MonoBehaviour
     }
 
     // 특정 타입의 효과 찾기
-    private Effect FindEffectByType(string effectType)
+    private Effect FindEffectByType(EffectType type)
     {
         foreach(var effect in _activeEffects.Values)
         {
-            if(effect != null && effect.EffectType == effectType && !effect.IsExpired)
+            if(effect != null && effect.Type == type && !effect.IsExpired)
             {
                 return effect;
             }
@@ -293,22 +282,6 @@ public class UnitStat : MonoBehaviour
 
         return null;
     }    
-
-    // 타입 이름 가져오기
-    private string GetEffetTypeName(EffectType type)
-    {
-        return type switch
-        {
-            EffectType.AttackBuff => StringValue.AttackBuff,
-            EffectType.SpeedBuff => StringValue.SpeedBuff,
-            EffectType.ArmorBuff => StringValue.ArmorBuff,
-            EffectType.AttackSpeedBuff => StringValue.AttackSpeedBuff,
-            EffectType.AbilityPowerBuff => StringValue.AbilityPowerBuff,
-            EffectType.SlowDebuff => StringValue.SlowDebuff,
-            EffectType.ArmorDebuff => StringValue.ArmorDebuff,
-            _ => ""
-        };       
-    }
 
     [BoxGroup("Level Test")]
     [Button(ButtonSizes.Medium)]

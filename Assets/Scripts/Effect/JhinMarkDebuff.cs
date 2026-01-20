@@ -4,7 +4,7 @@ public class JhinMarkDebuff : Effect
 {
     private void Awake()
     {
-        EffectType = "JhinMark";
+        Type = EffectType.JhinMark;
     }
 
     protected override void Apply()

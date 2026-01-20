@@ -31,27 +31,30 @@ public static class EffectFactory
             return null;
         }
 
-        Effect effect = null;
-
         switch (type)
         {
             case EffectType.AttackBuff:
-                var attackBuff = target.AddComponent<AttackBuff>();
-                attackBuff.Initialize(stat, duration, mod, value);
-                effect = attackBuff;    
-                break;
+                return CreateEffect<AttackBuff>(target, stat, type, mod, duration, value);
             case EffectType.SpeedBuff:
-                var speedBuff = target.AddComponent<SpeedBuff>();
-                speedBuff.Initialize(stat, duration, mod, value);
-                effect = speedBuff;
-                break;
+                return CreateEffect<SpeedBuff>(target, stat, type, mod, duration, value);
             case EffectType.JhinMark:
                 break;
             case EffectType.Root:
                 break;
-            
+            default:
+                return null;        
         }
 
-        return effect;
+        return null;
+    }
+
+    private static T CreateEffect<T>(GameObject target, UnitStat stat, EffectType type, ModType mod, float duration, float value) where T : Effect
+    {
+        T effectComponent = target.AddComponent<T>();
+
+        if (effectComponent is AttackBuff attack) attack.Initialize(stat, duration, mod, value, type);
+        if (effectComponent is SpeedBuff speedBuff) speedBuff.Initialize(stat, duration, mod, value, type);
+
+        return effectComponent;
     }
 }
