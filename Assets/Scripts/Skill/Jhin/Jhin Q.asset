@@ -16,8 +16,9 @@ MonoBehaviour:
   SkillName: 
   Icon: {fileID: 0}
   Description: 
-  Type_Target: 5
-  Type_Delivery: 2
+  Type_Target: 1
+  Type_Delivery: 1
+  TargetMask: 7
   MaxLevel: 5
   Costs:
   - 40

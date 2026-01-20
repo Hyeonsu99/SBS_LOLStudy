@@ -9,21 +9,27 @@ public class SkillSlot : MonoBehaviour
     private GameObject _owner;
     private UnitStat _ownerStat;
 
+    private const float RANGE_UNIT_SCALE = 100f;
+
+    //스킬 데이터
+    public SkillData Data => _data;
     // 스킬 레벨
     public int Level => _level;
     // 스킬 사용 가능 여부
     public bool IsReady => _level > 0 && _currentCooldown <= 0;
     // 남은 쿨타임 비율
     public float CooldownRatio => _data != null ? _currentCooldown / _data.GetCooldown(_level) : 0f;
-
+    // 현재 쿨타임
     public float CurrentCooldown => _currentCooldown;
+
+    public TargetType TargetType => _data != null ? _data.Type_Target : TargetType.None;
+    public bool IsUnitTargeting => TargetType == TargetType.Unit;
 
     public void Initialize(SkillData newData, GameObject owner, UnitStat stat)
     {
         _data = newData;
         _owner = owner;
         _ownerStat = stat;
-       
         _level = 0;
         _currentCooldown = 0;
 
@@ -36,7 +42,7 @@ public class SkillSlot : MonoBehaviour
     public float GetRange()
     {
         if (_data == null) return 0f;
-        return _data.GetRange(_level);
+        return _data.GetRange(_level) / RANGE_UNIT_SCALE;
     }
 
     public void LevelUp()

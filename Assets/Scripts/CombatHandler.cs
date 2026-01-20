@@ -7,14 +7,12 @@ public class CombatHandler : MonoBehaviour
 {
     private UnitStat _unitStat;
     private TargetValidator _targetValidator;
-    private UnitIdentity _myIdentity;
 
     private float _rangeBuffer = 0.1f;
     private const float RANGE_UNIT_SCALE = 100f;
 
     private GameObject _currentTarget;
     private UnitStat _targetStat;
-    private UnitIdentity _targetIdentity;
 
     private float _lastAttackTime;
 
@@ -28,7 +26,6 @@ public class CombatHandler : MonoBehaviour
     {
         _unitStat = GetComponent<UnitStat>();
         _targetValidator = GetComponent<TargetValidator>();
-        _myIdentity = GetComponent<UnitIdentity>();
 
         _damageProviders.AddRange(GetComponents<IAttackProvider>());
         _constraints.AddRange(GetComponents<IAttackConstraint>());
@@ -56,74 +53,77 @@ public class CombatHandler : MonoBehaviour
         _damageProviders.Remove(provider);
     }
 
+    // 타겟이 사거리 내에 존재하는지?
+    public bool IsTargetInAttackRange()
+    {
+        if (_currentTarget == null) return false;
+
+        float range = _unitStat.Current.Get(StatType.AttackRange) / RANGE_UNIT_SCALE;
+        float distance = Vector3.Distance(transform.position, _currentTarget.transform.position);
+
+        return distance <= range + _rangeBuffer;
+    }
+
+    // 타겟이 기본 공격 가능한 상태인지?
     public bool IsTargetValid()
     {
-        if(_currentTarget == null || _targetStat == null) return false;
+        if(_currentTarget == null) return false;   
 
-        return _targetValidator.IsValidTargetForBasicAttack(_currentTarget);
+        return _targetValidator != null && _targetValidator.IsValidTargetForBasicAttack(_currentTarget);    
     }
 
     public void UpdateCombat()
     {
-        if(!IsTargetValid())
-        {
-            ClearTarget();
-            return;
-        }
+        if (!IsTargetValid() || !IsTargetInAttackRange()) return;
 
-        float range = _unitStat.Current.AttackRange / 100f;
-        float distance = Vector3.Distance(transform.position, _currentTarget.transform.position); 
-        
-        if(distance <= range)
+        float attackSpeed = _unitStat.Current.Get(StatType.AttackSpeed);
+
+        float attackDelay = 1f / attackSpeed;
+
+        if(Time.time >= _lastAttackTime + attackDelay)
         {
             TryExecuteBasicAttack();
+            _lastAttackTime = Time.time;
         }
     }
 
     // 기본 공격
     private void TryExecuteBasicAttack()
     {
+        if(_targetStat == null) return;
+
         foreach(var constraint in _constraints)
         {
             if (!constraint.CanAttack()) return;
         }
 
-        // 공격 쿨타임 갱신 처리
-        float attackCooldown = 1f / _unitStat.Current.AttackSpeed;
-
-        if(Time.time > _lastAttackTime + attackCooldown)
+        DamageInfo info = new DamageInfo
         {
-            _lastAttackTime = Time.time;
+            Attacker = gameObject,
+            Target = _currentTarget,
+            RawDamage = _unitStat.Current.Get(StatType.AttackDamage),
+            BonusDamage = 0,
+            Type = DamageType.Physical,
+            isCritical = IsCritical()
+        };
 
-            if (!_currentTarget.TryGetComponent(out UnitStat targetStat)) return;
-
-            DamageInfo info = new DamageInfo
-            {
-                Attacker = gameObject,
-                Target = _currentTarget,
-                RawDamage = _unitStat.Current.Get(StatType.AttackDamage),
-                BonusDamage = 0,
-                Type = DamageType.Physical,
-                isCritical = IsCritical()
-            };
-
-            foreach(var provider in _damageProviders)
-            {
-                provider.DecorateDamage(ref info, _unitStat, targetStat);
-            }
-
-            float finalDamage = DamageCalculater.CalculateFinalDamage(_unitStat, targetStat, info);
-            targetStat.TakeDamage(finalDamage, gameObject);
-
-            Debug.Log($"기본 공격! 데미지 : {finalDamage}");
-
-            foreach (var constraint in _constraints)
-            {
-                constraint.OnAttack();
-            }
-
-            OnHitUpdate?.Invoke(info);
+        foreach(var provider in _damageProviders)
+        {
+            provider.DecorateDamage(ref info, _unitStat, _targetStat);
         }
+
+        float finalDamage = DamageCalculater.CalculateFinalDamage(_unitStat, _targetStat, info);
+        _targetStat.TakeDamage(finalDamage, gameObject);
+
+        foreach (var constraint in _constraints)
+        {
+            constraint.OnAttack();
+        }
+
+        OnAttackPerformed?.Invoke();
+        OnHitUpdate?.Invoke(info);
+
+        Debug.Log($"[Combat] {gameObject.name} -> {_currentTarget.name} | Final Damage: {finalDamage}");
     }
 
     private bool IsCritical()
@@ -132,8 +132,29 @@ public class CombatHandler : MonoBehaviour
         return UnityEngine.Random.Range(0f, 100f) < change;
     }
 
-    public void SetTarget(GameObject target) => _currentTarget = target;
-    public void ClearTarget() => _currentTarget = null;
+    public void SetTarget(GameObject target)
+    {
+        if(_currentTarget == target) return;
+
+        if(target == null)
+        {
+            ClearTarget();
+            return;
+        }
+
+        if (_targetValidator != null && !_targetValidator.IsValidTargetForBasicAttack(target))
+        {
+            return;
+        }
+
+        _currentTarget = target;
+        _targetStat = target.GetComponent<UnitStat>();  
+    }
+    public void ClearTarget()
+    {
+        _currentTarget = null;
+        _targetStat = null;
+    }
     public bool HasTarget() => _currentTarget != null;
     public Vector3 GetTargetPosition() => _currentTarget != null ? _currentTarget.transform.position : transform.position;
 

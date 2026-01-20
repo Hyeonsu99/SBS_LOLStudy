@@ -41,31 +41,28 @@ public class PlayerController : MonoBehaviour
 
         if (_combatHandler.HasTarget())
         {
-            if(!_combatHandler.IsTargetValid())
+            if (!_combatHandler.IsTargetValid())
             {
                 _combatHandler.ClearTarget();
-                _agent.ResetPath();
+                _movement.Stop();
                 return;
             }
 
-            float range = _stat.Current.AttackRange / 100f;
-            float distance = Vector3.Distance(transform.position, _combatHandler.GetTargetPosition());
-
-            if(distance <= range)
+            if (_combatHandler.IsTargetInAttackRange())
             {
-                _agent.ResetPath();
+                _movement.Stop();
                 _combatHandler.UpdateCombat();
             }
             else
             {
-                _movement?.Move(_combatHandler.GetTargetPosition());
+                _movement.Move(_combatHandler.GetTargetPosition());
             }
         }
     }
 
     public void HandleCommand(PlayerAction action, InputContext ctx)
     {
-        switch(action)
+        switch (action)
         {
             case PlayerAction.Move:
                 HandleRightClick(ctx);
@@ -76,7 +73,6 @@ public class PlayerController : MonoBehaviour
             case PlayerAction.CastSummoner:
                 HandleSummoner(ctx);
                 break;
-
         }
     }
 
@@ -84,69 +80,60 @@ public class PlayerController : MonoBehaviour
     {
         CancelPendingSkill(); // 스킬 예약 취소
 
-        if (ctx.target == null)
-            return;
+        _combatHandler.ClearTarget();
+        _movement?.Move(ctx.position);
 
-        if(_targetValidator.IsValidTargetForBasicAttack(ctx.target))
+        if (ctx.target != null)
         {
             _combatHandler.SetTarget(ctx.target);
-        }
-        else
-        {
-            _combatHandler.ClearTarget();
-            if (_positionValidator.IsValidMovePosition(ctx.position, ctx.target.layer))
-            {
-                _movement?.Move(ctx.position);
-            }
         }
     }
 
     private void HandlePendingSkill()
     {
-        if (_pendingSkillCtx.target == null)
+        // 추격 도중 스킬이 준비되지 않았거나 타겟이 사라지면 취소
+        if (!_skillHandler.IsSkillReady(_pendingSkillCtx.skillCommand) ||
+            _pendingSkillCtx.target == null)
         {
-            CancelPendingSkill();
+            _isSkillPending = false;
             return;
         }
 
-        // 해당 스킬의 사거리 가져오기
-        var slot = _skillHandler.GetSKillSlot(_pendingSkillCtx.skillCommand);
-        if (slot == null || slot.Level <= 0)
+        // 사거리 체크
+        if(_skillHandler.IsSkillInRange(_pendingSkillCtx))
         {
-            CancelPendingSkill();
-            return;
-        }
-
-        // SkillData에서 현재 레벨의 사거리 가져오기 (단위 변환 /100f는 프로젝트 기준에 맞게 조정)
-        float range = slot.GetRange() / 100f;
-        float distance = Vector3.Distance(transform.position, _pendingSkillCtx.target.transform.position);
-
-        if (distance <= range)
-        {
-            // 사거리 안이면 이동을 멈추고 시전
-            _agent.ResetPath();
+            _movement.Stop();
             _skillHandler.Execute(_pendingSkillCtx);
             _isSkillPending = false;
         }
         else
         {
-            // 사거리 밖이면 타겟에게 다가감
-            _agent.SetDestination(_pendingSkillCtx.target.transform.position);
+            _movement.Move(_pendingSkillCtx.target.transform.position);
         }
     }
 
     private void HandleSkill(InputContext ctx)
     {
-        // 타겟팅 스킬인 경우에만 예약 시스템 사용
-        if (ctx.target != null)
+        _combatHandler.ClearTarget();
+
+        SkillSlot slot = _skillHandler.GetSKillSlot(ctx.skillCommand);
+        if (slot == null) return;
+
+        if(slot.IsUnitTargeting)
         {
-            _combatHandler.ClearTarget(); // 기본 공격 대상 해제
-            _pendingSkillCtx = ctx;
-            _isSkillPending = true;
+            if(ctx.target != null && _targetValidator.IsValidTargetForSkill(ctx.target, slot.Data.TargetMask))
+            {
+                _pendingSkillCtx = ctx;
+                _isSkillPending = true;
+            }
+            else
+            {
+                Debug.Log("스킬을 사용할 수 없는 대상입니다");
+            }
         }
         else
         {
-            // 논타겟 스킬 등은 기존처럼 즉시 실행
+            _movement.Stop();
             _skillHandler.Execute(ctx);
         }
     }

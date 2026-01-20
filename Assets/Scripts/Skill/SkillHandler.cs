@@ -1,3 +1,4 @@
+using Unity.Burst.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -47,17 +48,40 @@ public class SkillHandler : MonoBehaviour
         };
     }
 
-    public void Execute(InputContext ctx)
+    public bool IsSkillInRange(InputContext ctx)
     {
-        switch (ctx.skillCommand)
+        SkillSlot slot = GetSKillSlot(ctx.skillCommand);
+        if(slot == null) return false;
+
+        if(slot.TargetType == TargetType.Direction || slot.TargetType == TargetType.None)
         {
-            case SkillCommand.Q:
-                Slot_Q.TryCast(ctx.target, ctx.target.transform.position);
-                break;
-            case SkillCommand.W:
-                Slot_W.TryCast(ctx.target, ctx.direction);
-                break;
+            return true;
         }
 
+        float range = slot.GetRange();
+
+        Vector3 targetpos = ctx.target != null ? ctx.target.transform.position : ctx.position;
+        
+        targetpos.y = transform.position.y;
+
+        float distance = Vector3.Distance(transform.position, targetpos);
+
+        return distance <= range;
+    }
+
+    public bool IsSkillReady(SkillCommand cmd)
+    {
+        SkillSlot slot = GetSKillSlot(cmd);
+        return slot != null && slot.IsReady;
+    }
+
+    public void Execute(InputContext ctx)
+    {
+        SkillSlot slot = GetSKillSlot(ctx.skillCommand);
+
+        if (slot != null)
+        {
+            slot.TryCast(ctx.target, ctx.position);
+        }
     }
 }

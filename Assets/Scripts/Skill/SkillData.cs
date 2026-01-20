@@ -1,24 +1,35 @@
+using System;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[Flags]
+public enum TargetFilter
+{
+    None = 0,
+    Champion = 1 << 0,
+    Minion = 1 << 1,
+    Monster = 1 << 2,
+    Structure = 1 << 3,
+    Unit = Champion | Minion | Monster,
+    All = Champion | Minion | Monster | Structure
+}
+
 public enum TargetType
 {
-    None,
-    Self,
-    EnemyTarget,
-    AllyTarget,
-    Ground,
-    EnemyAll
+    None, // 즉시 시전
+    Unit, // 유닛 타겟팅 (추격 필요)
+    Point, // 지점 타겟팅 (지점까지 이동)
+    Direction // 방향 타겟팅(논타겟팅)
 }
 
 public enum DeliveryType
 {
-    Passive,
     Instant,
     Projectile,
     Area,
-    Buff
+    Buff,
+    Passive
 }
 
 [CreateAssetMenu(menuName = "Data/Skill Data")]
@@ -31,6 +42,8 @@ public class SkillData : ScriptableObject
 
     public TargetType Type_Target;
     public DeliveryType Type_Delivery;
+
+    public TargetFilter TargetMask = TargetFilter.All;
 
     [Header("Level Data")]
     public int MaxLevel = 5;
