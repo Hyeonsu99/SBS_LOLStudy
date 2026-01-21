@@ -1,10 +1,14 @@
+using TMPro;
 using UnityEngine;
 
 public class SkillSlot : MonoBehaviour
 {
     [SerializeField] private SkillData _data;
     [SerializeField] private int _level = 0;
+
     private float _currentCooldown;
+    private float _chargeTimer;
+    private int _currentCharges;
 
     private GameObject _owner;
     private UnitStat _ownerStat;
@@ -16,9 +20,33 @@ public class SkillSlot : MonoBehaviour
     // 스킬 레벨
     public int Level => _level;
     // 스킬 사용 가능 여부
-    public bool IsReady => _level > 0 && _currentCooldown <= 0;
+    public bool IsReady
+    {
+        get
+        {
+            if(_level <= 0) return false;
+            if(UseChargeSystem) return _currentCharges > 0;
+            return _currentCooldown <= 0;
+        }
+    }
+    // 충전형 스킬인지 판단
+    public bool UseChargeSystem => _data != null && _data.MaxCharges > 0;
+    // 현재 충전된 개수
+    public int CurrentCharges => _currentCharges;   
     // 남은 쿨타임 비율
-    public float CooldownRatio => _data != null ? _currentCooldown / _data.GetCooldown(_level) : 0f;
+    public float CooldownRatio
+    {
+        get
+        {
+            if (_data == null) return 0f;
+
+            if(UseChargeSystem)
+            {
+                return _currentCharges == _data.MaxCharges ? 0f : _chargeTimer / _data.GetCooldown(_level);
+            }
+            return _currentCooldown / _data.GetCooldown(_level);
+        }
+    }
     // 현재 쿨타임
     public float CurrentCooldown => _currentCooldown;
 
@@ -32,6 +60,12 @@ public class SkillSlot : MonoBehaviour
         _ownerStat = stat;
         _level = 0;
         _currentCooldown = 0;
+
+        if(UseChargeSystem)
+        {
+            _currentCharges = _data.MaxCharges;
+            _chargeTimer = 0f;
+        }
 
         if(_data != null && _data.Type_Delivery == DeliveryType.Passive)
         {
@@ -48,9 +82,17 @@ public class SkillSlot : MonoBehaviour
     public void LevelUp()
     {
         if(_data == null || _level >= _data.MaxLevel) return;
-        if(_level > 0) _data.OnUnEquip(_owner);
+
+        bool firstLearn = _level == 0;
+        if (!firstLearn) _data.OnUnEquip(_owner);
+
         _level++;
         _data.OnEquip(_owner, _ownerStat, _level);
+
+        if(firstLearn && UseChargeSystem)
+        {
+            _currentCharges = _data.MaxCharges;
+        }
     }
 
     public bool CanLevelUp(int playerLevel, int currentSkillPoint)
@@ -83,26 +125,60 @@ public class SkillSlot : MonoBehaviour
     {
         if(!IsReady) return false;
 
-        float cost = _data.GetCost(_level);
-        float currentMp = _ownerStat.CurrentMP;
+        if(_ownerStat.IsRoot && _data.IsMovementSkill)
+        {
+            return false;
+        }
 
-        if (currentMp < cost) return false;
+        float cost = _data.GetCost(_level);
+        if (_ownerStat.CurrentMP < cost) return false;
 
         // 마나 소모 로직 추가
         _ownerStat.RestoreMP(-cost);
 
         _data.Execute(_owner, target, position, _level);
-        _currentCooldown = _data.GetCooldown(_level);
-        
+
+        if(UseChargeSystem)
+        {
+            if(_currentCharges == _data.MaxCharges)
+            {
+                _chargeTimer = _data.GetCooldown(_level);
+            }
+            _currentCharges--;
+        }
+        else
+        {
+            _currentCooldown = _data.GetCooldown(_level);
+        }
+          
         return true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (_currentCooldown > 0)
+        if (!UseChargeSystem && _currentCooldown > 0)
         {
             _currentCooldown -= Time.deltaTime;
+        }
+
+        if(UseChargeSystem && _currentCharges < _data.MaxCharges)
+        {
+            _chargeTimer -= Time.deltaTime;
+
+            if(_chargeTimer <= 0)
+            {
+                _currentCharges++;
+
+                if (_currentCharges < _data.MaxCharges)
+                {
+                    _chargeTimer = _data.GetCooldown(_level);
+                }
+                else
+                {
+                    _chargeTimer = 0f;
+                }
+            }
         }
     }
 }

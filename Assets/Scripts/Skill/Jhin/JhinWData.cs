@@ -12,7 +12,7 @@ public class JhinWData : SkillData
     public float[] RootDurations = { 1.25f, 1.5f, 1.75f, 2f, 2.25f };
     public float MarkDuration = 4.0f;
 
-    public float ProjectileSpeed = 50f;
+    public float ProjectileSpeed = 44.44f;
     // 롤 기준 사거리, 사용할땐 100으로 나눠 사용
     public float MaxDistance = 3000f;
 
@@ -23,8 +23,9 @@ public class JhinWData : SkillData
         var WHandler = owner.GetOrAddComponent<JhinWHandler>();
         var skillHandler = owner.GetComponent<SkillHandler>();
         var combatHandler = owner.GetComponent<CombatHandler>();
+        var unitIdentity = owner.GetComponent<UnitIdentity>();
 
-        WHandler.SetUp(this, skillHandler, combatHandler);
+        WHandler.SetUp(this, skillHandler, combatHandler, unitIdentity);
 
         base.OnEquip(owner, stat, level);
     }

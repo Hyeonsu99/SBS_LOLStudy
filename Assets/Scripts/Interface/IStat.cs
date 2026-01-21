@@ -26,11 +26,13 @@ public enum ModType
     PercentAdd
 }
 
+// ModifierType : 어떤 곳에서 능력치가 제공되고 있나...
 public enum ModifierType
 {
     Growth, // 레벨업 성장
     Item,
     Buff,
+    Debuff,
     Passive
 }
 

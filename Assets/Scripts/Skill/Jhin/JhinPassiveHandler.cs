@@ -80,7 +80,6 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
         _lastActionTime = Time.time;
 
         CurrentAmmo--;
-        Debug.Log(CurrentAmmo);
 
         // 장전 중 탄환이 남은 상태에서 행동하면 장전 취소
         if (IsReloading && CurrentAmmo > 0)

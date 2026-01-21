@@ -49,10 +49,20 @@ public class StatDecorator : IStat
         return _mod.Mod switch
         {
             ModType.Flat => value + _mod.Value,
-            ModType.PercentAdd => value + (_baseEntity.Get(type) * _mod.Value),
+            ModType.PercentAdd => HandlePercentAdd(type, value),
             ModType.PercentMul => value * (1 + _mod.Value),
             _ => value
         };
+    }
+
+    private float HandlePercentAdd(StatType type, float currentVal)
+    {
+        if (type == StatType.AttackSpeed)
+        {
+            return currentVal + (_baseEntity.Get(type) * _mod.Value);
+        }
+
+        return currentVal * (1 + _mod.Value);
     }
 
     public float Level => Get(StatType.Level);

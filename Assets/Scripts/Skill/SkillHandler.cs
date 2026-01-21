@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using Unity.Burst.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -82,6 +83,18 @@ public class SkillHandler : MonoBehaviour
         if (slot != null)
         {
             slot.TryCast(ctx.target, ctx.position);
+        }
+    }
+
+    [BoxGroup("Skill Test")]
+    [Button(ButtonSizes.Medium)]
+    public void TestSkillLevelUp(SkillCommand cmd)
+    {
+        var slot = GetSKillSlot(cmd);
+        if (slot != null) 
+        { 
+            slot.LevelUp(); 
+            Debug.Log($"{cmd} 스킬 레벨업! 현재 스킬 레벨 {slot.Level}");
         }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class RootDebuff : Effect
 {
@@ -10,6 +11,14 @@ public class RootDebuff : Effect
     protected override void Apply()
     {
         // 이동 불가 상태로 만들기
+        if(TryGetComponent(out NavMeshAgent agent))
+        {
+            if(agent.enabled)
+            {
+                agent.ResetPath();
+                agent.velocity = Vector3.zero;
+            }
+        }
     }
 
     protected override void Remove()

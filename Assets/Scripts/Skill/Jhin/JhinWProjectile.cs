@@ -4,6 +4,7 @@ public class JhinWProjectile : MonoBehaviour
 {
     private GameObject _owner;
     private UnitStat _ownerStat;
+    private UnitIdentity _ownerIdentity;
 
     private Vector3 _direction;
     private float _baseDamage;
@@ -19,6 +20,7 @@ public class JhinWProjectile : MonoBehaviour
     {
         _owner = owner;
         _ownerStat = owner.GetComponent<UnitStat>();
+        _ownerIdentity = owner.GetComponent<UnitIdentity>();
         _direction = dir;
         _speed = speed;
         _baseDamage = baseDmg;
@@ -48,14 +50,18 @@ public class JhinWProjectile : MonoBehaviour
     {
         if (other.gameObject == _owner) return;
 
+        if (!other.TryGetComponent(out UnitIdentity targetIdentity)) return;
+        
+        if(!_ownerIdentity.IsEnemy(targetIdentity)) return; 
+
         if(other.TryGetComponent(out UnitStat targetStat))
         {
             float currentAd = _ownerStat.Current.Get(StatType.AttackDamage);
             float finalDamage = _baseDamage + (currentAd * _adRatio);
 
             // 챔피언 미니언 구분
-            bool isChampion = other.CompareTag("Champion");
-            bool isMinion = other.CompareTag("Minion");
+            bool isChampion = targetIdentity.Type == UnitType.Champion;
+            bool isMinion = targetIdentity.Type == UnitType.Minion;
 
             if(isMinion)
             {
@@ -79,8 +85,7 @@ public class JhinWProjectile : MonoBehaviour
             {
                 if(targetStat.HasEffect(EffectType.JhinMark))
                 {
-
-                    targetStat.RemoveEffect(EffectType.JhinMark.ToString());
+                    targetStat.RemoveEffect(EffectType.JhinMark);
 
                     targetStat.ApplyEffect(EffectType.Root, ModType.Flat, _rootDuration, 0);
 

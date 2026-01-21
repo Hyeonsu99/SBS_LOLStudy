@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerInput : MonoBehaviour
 {
     private PlayerController _controller;
+    private UnitStat _unitStat;
     private Invoker _invoker;
     private Camera _mainCamera;
 
@@ -12,12 +13,13 @@ public class PlayerInput : MonoBehaviour
     private void Awake()
     {
         _invoker = GetComponent<Invoker>();
+        _unitStat = GetComponent<UnitStat>();
         _controller = GetComponent<PlayerController>();
         _mainCamera = Camera.main;
     }
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             if (Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
             {
@@ -25,7 +27,7 @@ public class PlayerInput : MonoBehaviour
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.W))
         {
             if (Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
             {
@@ -33,7 +35,7 @@ public class PlayerInput : MonoBehaviour
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             if (Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
             {
@@ -41,7 +43,7 @@ public class PlayerInput : MonoBehaviour
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             if (Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
             {
@@ -49,7 +51,7 @@ public class PlayerInput : MonoBehaviour
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.D))
         {
             if (Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
             {
@@ -65,12 +67,15 @@ public class PlayerInput : MonoBehaviour
             }
         }
 
-        if(Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1))
         {
+            if (_unitStat.IsRoot)
+                return;
+
             if (Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
             {
-                Enqueue(PlayerAction.Move, new InputContext{ position = hit.point, target = hit.transform.gameObject });
-            }           
+                Enqueue(PlayerAction.Move, new InputContext { position = hit.point, target = hit.transform.gameObject });
+            }
         }
 
         UpdateMoveHover();
@@ -83,7 +88,7 @@ public class PlayerInput : MonoBehaviour
 
     private void UpdateMoveHover()
     {
-        if(Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
+        if (Physics.Raycast(_mainCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100f))
         {
             HoverTarget = hit.transform.gameObject;
         }

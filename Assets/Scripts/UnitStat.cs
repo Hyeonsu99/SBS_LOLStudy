@@ -15,6 +15,8 @@ public class UnitStat : MonoBehaviour
     public float CurrentHP { get; private set; }
     public float CurrentMP { get; private set; }
 
+    public bool IsRoot => HasEffect(EffectType.Root);
+
     private readonly List<StatModifier> _mods = new();
     private readonly Dictionary<string, Effect> _activeEffects = new();
     private readonly List<IStatTransformer> _transformers = new();
@@ -151,22 +153,35 @@ public class UnitStat : MonoBehaviour
         // 레벨당 성장 적용
         result = new LevelStatDecorator(result, StatData);
 
-        // 계산 우선 순위 사용
-        ModType[] priorityOrder =
+        foreach(var mod in _mods)
         {
-            ModType.Flat,
-            ModType.PercentAdd,
-            ModType.PercentMul
-        };
-
-        foreach (ModType modType in priorityOrder)
-        {
-            foreach (var mod in _mods)
+            if(mod.Stat != StatType.Level && mod.Mod == ModType.Flat)
             {
-                if(mod.Stat != StatType.Level && mod.Mod == modType)
-                {
-                    result = new StatDecorator(result, mod, baseEntity);
-                }           
+                result = new StatDecorator(result, mod, baseEntity);
+            }
+        }
+
+        foreach(StatType type in Enum.GetValues(typeof(StatType)))
+        {
+            float totalPercent = 0f;
+
+            var percentMods = _mods.FindAll(m => m.Stat == type && m.Mod == ModType.PercentAdd);
+
+            if(percentMods.Count > 0)
+            {
+                foreach (var mod in percentMods)
+                    totalPercent += mod.Value;
+
+                var sumMod = new StatModifier($"{type}_SumPercent", type, ModType.PercentAdd, totalPercent, ModifierType.Passive);
+                result = new StatDecorator(result, sumMod, baseEntity);
+            }
+        }
+
+        foreach(var mod in _mods)
+        {
+            if (mod.Stat != StatType.Level && mod.Mod == ModType.PercentMul)
+            {
+                result = new StatDecorator(result, mod, baseEntity);
             }
         }
 
@@ -179,6 +194,21 @@ public class UnitStat : MonoBehaviour
         Current = result;
 
         OnStatChanged?.Invoke();
+    }
+
+    public float GetBonusStat(StatType type)
+    {
+        float bonus = 0f;
+
+        foreach (var mod in _mods)
+        {
+            if (mod.Stat == type && mod.Type != ModifierType.Growth)
+            {
+                bonus += mod.Value;
+            }
+        }
+
+        return bonus;
     }
 
     public void AddModifier(StatModifier modifier) { _mods.Add(modifier); Rebuild(); }
@@ -243,19 +273,13 @@ public class UnitStat : MonoBehaviour
         }
     }
 
-    public float GetBonusStat(StatType type)
+    public void RemoveEffect(EffectType type)
     {
-        float bonus = 0f;
-
-        foreach(var mod in _mods)
+        var effect = FindEffectByType(type);
+        if(effect != null)
         {
-            if(mod.Stat == type && mod.Type != ModifierType.Growth)
-            {
-                bonus += mod.Value;
-            }
+            RemoveEffect(effect.EffectID);
         }
-
-        return bonus;
     }
 
     public bool HasEffect(EffectType type)

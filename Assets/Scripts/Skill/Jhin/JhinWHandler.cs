@@ -5,12 +5,14 @@ public class JhinWHandler : MonoBehaviour
     private JhinWData _data;
     private SkillHandler _skillHandler;
     private CombatHandler _combatHandler;
+    private UnitIdentity _unitIdentity;
 
-    public void SetUp(JhinWData data, SkillHandler skillHandler, CombatHandler combatHandler)
+    public void SetUp(JhinWData data, SkillHandler skillHandler, CombatHandler combatHandler, UnitIdentity unitIdentity)
     {
         _data = data;
         _skillHandler = skillHandler;
         _combatHandler = combatHandler;
+        _unitIdentity = unitIdentity;
 
         if(combatHandler != null)
         {
@@ -33,6 +35,15 @@ public class JhinWHandler : MonoBehaviour
     private void ApplyMark(GameObject target)
     {
         if(target == null || _skillHandler == null) return;
+
+        if(target.TryGetComponent(out UnitIdentity unitIdentity))
+        {
+            if (!_unitIdentity.IsEnemy(unitIdentity)) return;
+        }
+        else
+        {
+            return;
+        }
 
         SkillSlot wSlot = _skillHandler.Slot_W;
 

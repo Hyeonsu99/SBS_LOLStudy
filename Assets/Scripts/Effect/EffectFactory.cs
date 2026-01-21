@@ -38,9 +38,11 @@ public static class EffectFactory
             case EffectType.SpeedBuff:
                 return CreateEffect<SpeedBuff>(target, stat, type, mod, duration, value);
             case EffectType.JhinMark:
-                break;
+                return CreateEffect<JhinMarkDebuff>(target, stat, type, mod, duration, value);
             case EffectType.Root:
-                break;
+                return CreateEffect<RootDebuff>(target, stat, type, mod, duration, value);
+            case EffectType.SlowDebuff:
+                return CreateEffect<SlowDebuff>(target, stat, type, mod, duration, value);
             default:
                 return null;        
         }
@@ -54,6 +56,9 @@ public static class EffectFactory
 
         if (effectComponent is AttackBuff attack) attack.Initialize(stat, duration, mod, value, type);
         if (effectComponent is SpeedBuff speedBuff) speedBuff.Initialize(stat, duration, mod, value, type);
+        if (effectComponent is JhinMarkDebuff jhinMark) jhinMark.Initialize(stat, duration, type);
+        if (effectComponent is RootDebuff rootDebuff) rootDebuff.Initialize(stat, duration, type);
+        if (effectComponent is SlowDebuff slowDebuff) slowDebuff.Initialize(stat, duration, value, type);
 
         return effectComponent;
     }

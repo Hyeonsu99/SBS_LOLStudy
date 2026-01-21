@@ -45,6 +45,11 @@ public class SkillData : ScriptableObject
 
     public TargetFilter TargetMask = TargetFilter.All;
 
+    public bool IsMovementSkill;
+
+    // 0이면 일반 스킬, 1 이상이면 충전형 스킬..
+    public int MaxCharges = 0;
+
     [Header("Level Data")]
     public int MaxLevel = 5;
     public float[] Costs;
