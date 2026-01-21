@@ -37,7 +37,8 @@ public class JhinETrap : MonoBehaviour
         if (other.TryGetComponent(out UnitIdentity targetId))
         {
             if (!_ownerIdentity.IsEnemy(targetId)) return;
-            if (targetId.Type == UnitType.Champion)
+
+            if (targetId.Type != UnitType.Structure)
             {
                 ActivateTrap();
             }

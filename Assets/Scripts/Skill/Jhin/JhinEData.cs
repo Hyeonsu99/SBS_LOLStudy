@@ -27,7 +27,18 @@ public class JhinEData : SkillData
     public override void Execute(GameObject owner, GameObject target, Vector3 position, int level)
     {
         Vector3 targetPos = position;
-        targetPos.y = owner.transform.position.y; // 바닥 보정
+        
+        int groundMask = LayerMask.GetMask(StringValue.GroundLayerName);
+        RaycastHit hit;
+
+        if (Physics.Raycast(targetPos + Vector3.up * 50f, Vector3.down, out hit, 100f, groundMask))
+        {
+            targetPos.y = hit.point.y;
+        }
+        else
+        {
+            targetPos.y = 0f; // 바닥을 못 찾으면 0으로 초기화
+        }
 
         Vector3 startPos = owner.transform.position + Vector3.up;
 

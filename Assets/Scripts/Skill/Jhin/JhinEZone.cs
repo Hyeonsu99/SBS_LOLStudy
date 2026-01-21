@@ -43,7 +43,7 @@ public class JhinEZone : MonoBehaviour
 
     private void Explode()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, 2.5f);
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 2.6f);
         foreach (var col in colliders)
         {
             if (col.TryGetComponent(out UnitIdentity targetId) && col.TryGetComponent(out UnitStat targetStat))
@@ -70,6 +70,18 @@ public class JhinEZone : MonoBehaviour
         float finalDamage = baseDmg + (ad * _data.AdRatio) + (ap * _data.ApRatio);
 
         if (unitType == UnitType.Minion) finalDamage *= _data.MinionDamageRatio;
+
+        var info = new DamageInfo
+        {
+            Attacker = _owner,
+            Target = targetStat.gameObject,
+            RawDamage = finalDamage,
+            Type = DamageType.Magic,
+            BonusDamage = 0,
+            isCritical = false,
+        };
+
+        finalDamage = DamageCalculater.CalculateFinalDamage(ownerStat, targetStat, info);
 
         targetStat.TakeDamage(finalDamage, _owner);
     }

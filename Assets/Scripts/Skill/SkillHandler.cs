@@ -61,11 +61,23 @@ public class SkillHandler : MonoBehaviour
 
         float range = slot.GetRange();
 
-        Vector3 targetpos = ctx.target != null ? ctx.target.transform.position : ctx.position;
-        
-        targetpos.y = transform.position.y;
+        Vector3 targetPos;
 
-        float distance = Vector3.Distance(transform.position, targetpos);
+        // 1. 유닛 타겟팅 스킬이고 + 타겟 오브젝트가 존재할 때만 -> 타겟의 위치 사용
+        if (slot.TargetType == TargetType.Unit && ctx.target != null)
+        {
+            targetPos = ctx.target.transform.position;
+        }
+        // 2. 그 외 (지점 타겟팅이거나, 타겟이 없는 경우) -> 클릭한 좌표(ctx.position) 사용
+        else
+        {
+            targetPos = ctx.position;
+        }
+
+        // 높이 보정 (Y축 차이 무시)
+        targetPos.y = transform.position.y;
+
+        float distance = Vector3.Distance(transform.position, targetPos);
 
         return distance <= range;
     }

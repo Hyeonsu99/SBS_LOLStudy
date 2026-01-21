@@ -91,16 +91,25 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePendingSkill()
     {
+        var command = _pendingSkillCtx.skillCommand;
+
         // 추격 도중 스킬이 준비되지 않았거나 타겟이 사라지면 취소
-        if (!_skillHandler.IsSkillReady(_pendingSkillCtx.skillCommand) ||
-            _pendingSkillCtx.target == null)
+        if (!_skillHandler.IsSkillReady(command))
+        {
+            _isSkillPending = false;
+            return;
+        }
+
+        SkillSlot slot = _skillHandler.GetSKillSlot(command);
+
+        if (slot.IsUnitTargeting && _pendingSkillCtx.target == null)
         {
             _isSkillPending = false;
             return;
         }
 
         // 사거리 체크
-        if(_skillHandler.IsSkillInRange(_pendingSkillCtx))
+        if (_skillHandler.IsSkillInRange(_pendingSkillCtx))
         {
             _movement.Stop();
             _skillHandler.Execute(_pendingSkillCtx);
@@ -108,7 +117,20 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            _movement.Move(_pendingSkillCtx.target.transform.position);
+            Vector3 dest;
+
+            // 1. 유닛 타겟팅이고 타겟이 있다면 -> 타겟의 위치로 이동
+            if (slot.IsUnitTargeting && _pendingSkillCtx.target != null)
+            {
+                dest = _pendingSkillCtx.target.transform.position;
+            }
+            // 2. 그 외(지점 타겟팅 등) -> 클릭한 좌표(ctx.position)로 이동
+            else
+            {
+                dest = _pendingSkillCtx.position;
+            }
+
+            _movement.Move(dest);
         }
     }
 
@@ -129,6 +151,19 @@ public class PlayerController : MonoBehaviour
             else
             {
                 Debug.Log("스킬을 사용할 수 없는 대상입니다");
+            }
+        }
+        else if(slot.TargetType == TargetType.Point)
+        {
+            if (_skillHandler.IsSkillInRange(ctx))
+            {
+                _movement.Stop();
+                _skillHandler.Execute(ctx);
+            }
+            else
+            {
+                _pendingSkillCtx = ctx;
+                _isSkillPending = true;
             }
         }
         else
