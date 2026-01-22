@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class JhinETrap : MonoBehaviour
@@ -9,6 +10,7 @@ public class JhinETrap : MonoBehaviour
 
     private int _currentHealth = 6;
     private bool _isActivated = false;
+    [SerializeField] private bool _isInstalled = false;
 
     [SerializeField] private MeshRenderer _renderer;
 
@@ -19,8 +21,18 @@ public class JhinETrap : MonoBehaviour
         _skillLevel = level;
         _ownerIdentity = owner.GetComponent<UnitIdentity>();
 
+        StartCoroutine(InstallCheckCoroutine());    
+
         Destroy(gameObject, _data.TrapDuration);
     }
+
+    private IEnumerator InstallCheckCoroutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        _isInstalled = true;
+    }
+
 
     public void OnAttackHit(bool isRanged)
     {
@@ -30,9 +42,10 @@ public class JhinETrap : MonoBehaviour
         if (_currentHealth <= 0) Destroy(gameObject);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (_isActivated) return;
+        if (_isInstalled == false) return;
 
         if (other.TryGetComponent(out UnitIdentity targetId))
         {
@@ -51,6 +64,7 @@ public class JhinETrap : MonoBehaviour
         if (_data.ZonePrefab != null)
         {
             GameObject zoneObj = Instantiate(_data.ZonePrefab, transform.position, Quaternion.identity);
+
             if (zoneObj.TryGetComponent(out JhinEZone zone))
             {
                 zone.Initialize(_owner, _data, _skillLevel);

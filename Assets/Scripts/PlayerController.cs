@@ -32,6 +32,13 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(_skillHandler.IsCasting)
+        {
+            _movement.Stop();
+            _combatHandler.ClearTarget();
+            return;
+        }
+
         // 1. 예약된 스킬이 있는지 먼저 확인
         if (_isSkillPending)
         {
@@ -62,6 +69,8 @@ public class PlayerController : MonoBehaviour
 
     public void HandleCommand(PlayerAction action, InputContext ctx)
     {
+        if (_skillHandler.IsCasting) return;
+
         switch (action)
         {
             case PlayerAction.Move:

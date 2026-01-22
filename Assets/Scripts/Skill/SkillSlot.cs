@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ public class SkillSlot : MonoBehaviour
 
     private GameObject _owner;
     private UnitStat _ownerStat;
+    private SkillHandler _skillHandler;
 
     private const float RANGE_UNIT_SCALE = 100f;
 
@@ -58,6 +60,7 @@ public class SkillSlot : MonoBehaviour
         _data = newData;
         _owner = owner;
         _ownerStat = stat;
+        _skillHandler = owner.GetComponent<SkillHandler>();
         _level = 0;
         _currentCooldown = 0;
 
@@ -125,10 +128,9 @@ public class SkillSlot : MonoBehaviour
     {
         if(!IsReady) return false;
 
-        if(_ownerStat.IsRoot && _data.IsMovementSkill)
-        {
-            return false;
-        }
+        if (_skillHandler.IsCasting) return false;
+
+        if (_ownerStat.IsRoot && _data.IsMovementSkill) return false;
 
         float cost = _data.GetCost(_level);
         if (_ownerStat.CurrentMP < cost) return false;
@@ -136,11 +138,45 @@ public class SkillSlot : MonoBehaviour
         // 마나 소모 로직 추가
         _ownerStat.RestoreMP(-cost);
 
+        ApplyCooldown();
+
+        // 시전 시간이 있으면 코루틴 시작, 없으면 즉시 발동
+        if (_data.CastTime > 0)
+        {
+            StartCoroutine(CastCoroutine(target, position));
+        }
+        else
+        {
+            _data.Execute(_owner, target, position, _level);
+        }
+
+        return true;
+    }
+
+    private IEnumerator CastCoroutine(GameObject target, Vector3 position)
+    {
+        // 1. 시전 상태 설정
+        _skillHandler.IsCasting = true;
+
+        // 3. 시전 시작 훅 (시각 효과 등)
+        _data.OnCastStart(_owner, position, _level);
+
+        // 4. 대기
+        yield return new WaitForSeconds(_data.CastTime);
+
+        // 5. 스킬 실발동
         _data.Execute(_owner, target, position, _level);
 
-        if(UseChargeSystem)
+        // 6. 종료 처리
+        _data.OnCastFinished(_owner);
+        _skillHandler.IsCasting = false;
+    }
+
+    private void ApplyCooldown()
+    {
+        if (UseChargeSystem)
         {
-            if(_currentCharges == _data.MaxCharges)
+            if (_currentCharges == _data.MaxCharges)
             {
                 _chargeTimer = _data.GetCooldown(_level);
             }
@@ -150,8 +186,6 @@ public class SkillSlot : MonoBehaviour
         {
             _currentCooldown = _data.GetCooldown(_level);
         }
-          
-        return true;
     }
 
     // Update is called once per frame

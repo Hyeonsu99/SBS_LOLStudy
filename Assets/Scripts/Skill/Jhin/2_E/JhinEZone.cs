@@ -6,6 +6,7 @@ public class JhinEZone : MonoBehaviour
     private GameObject _owner;
     private JhinEData _data;
     private int _skillLevel;
+    private SkillHandler _skillHandler;
 
     private HashSet<UnitStat> _targetsInside = new HashSet<UnitStat>();
 
@@ -14,19 +15,37 @@ public class JhinEZone : MonoBehaviour
         _owner = owner;
         _data = data;
         _skillLevel = level;
+        
+        _skillHandler = owner.GetComponent<SkillHandler>(); 
+
         Invoke(nameof(Explode), _data.ExplosionDelay);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (other.TryGetComponent(out UnitIdentity targetId) && other.TryGetComponent(out UnitStat stat))
         {
             var ownerId = _owner.GetComponent<UnitIdentity>();
             if (!ownerId.IsEnemy(targetId)) return;
 
+            if(CanApplyMark())
+            {
+                stat.ApplyEffect(EffectType.JhinMark, ModType.PercentMul, 4f, 0f);
+            }
+
             stat.ApplyEffect(EffectType.SlowDebuff, ModType.PercentAdd, 10f, _data.SlowPercentage);
             _targetsInside.Add(stat);
         }
+    }
+
+    private bool CanApplyMark()
+    {
+        if(_skillHandler == null) return false;
+
+        SkillSlot wSlot = _skillHandler.Slot_W;
+        if (wSlot == null || wSlot.Level <= 0) return false;
+
+        return wSlot.IsReady || wSlot.CurrentCooldown <= 4.0f;
     }
 
     private void OnTriggerExit(Collider other)

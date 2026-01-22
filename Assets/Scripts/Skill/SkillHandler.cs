@@ -14,6 +14,8 @@ public class SkillHandler : MonoBehaviour
     public SkillSlot Slot_E;
     public SkillSlot Slot_R;
 
+    public bool IsCasting { get; set; } = false;
+
     private void Awake()
     {
         _stat = GetComponent<UnitStat>();

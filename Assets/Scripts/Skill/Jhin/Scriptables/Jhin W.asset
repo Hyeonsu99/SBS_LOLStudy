@@ -21,6 +21,7 @@ MonoBehaviour:
   TargetMask: 7
   IsMovementSkill: 0
   MaxCharges: 0
+  CastTime: 0.75
   MaxLevel: 5
   Costs:
   - 50

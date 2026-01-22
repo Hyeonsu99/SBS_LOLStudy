@@ -45,10 +45,13 @@ public class SkillData : ScriptableObject
 
     public TargetFilter TargetMask = TargetFilter.All;
 
-    public bool IsMovementSkill;
+    public bool IsMovementSkill = false;
 
     // 0이면 일반 스킬, 1 이상이면 충전형 스킬..
     public int MaxCharges = 0;
+
+    // 0이면 즉발 스킬, 0 이상이면 캐스팅 후 시전
+    public float CastTime = 0f;
 
     [Header("Level Data")]
     public int MaxLevel = 5;
@@ -73,4 +76,7 @@ public class SkillData : ScriptableObject
     public virtual void Execute(GameObject owner, GameObject target, Vector3 position, int level) { }
     public virtual void OnEquip(GameObject owner, UnitStat stat, int level) { }
     public virtual void OnUnEquip(GameObject owner) { }
+
+    public virtual void OnCastStart(GameObject owner, Vector3 position, int level) { }
+    public virtual void OnCastFinished(GameObject owner) { }
 }

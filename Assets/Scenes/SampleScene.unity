@@ -1063,7 +1063,7 @@ GameObject:
   - component: {fileID: 925437582}
   - component: {fileID: 925437576}
   m_Layer: 7
-  m_Name: Player
+  m_Name: Jhin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
