@@ -13,12 +13,12 @@ public class SlowDebuff : Effect
 
     protected override void Apply()
     {
-        modifier = new StatModifier(EffectID, StatType.MoveSpeed, ModType.PercentAdd, -_slowPercent, ModifierType.Debuff);
-        targetStat.AddModifier(modifier);
+        _modifier = new StatModifier(EffectID, StatType.MoveSpeed, ModType.PercentAdd, -_slowPercent, ModifierType.Debuff);
+        _targetStat.AddModifier(_modifier);
     }
 
     protected override void Remove()
     {
-        if(targetStat != null) targetStat.RemoveModifier(modifier);
+        if(_targetStat != null) _targetStat.RemoveModifier(_modifier);
     }
 }

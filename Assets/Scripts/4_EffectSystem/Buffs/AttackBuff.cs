@@ -14,16 +14,16 @@ public class AttackBuff : Effect
 
     protected override void Apply()
     {
-        modifier = new StatModifier(EffectID, StatType.AttackDamage, modType, attackBouns, ModifierType.Buff);
-        targetStat.AddModifier(modifier);
+        _modifier = new StatModifier(EffectID, StatType.AttackDamage, modType, attackBouns, ModifierType.Buff);
+        _targetStat.AddModifier(_modifier);
         Debug.Log($"{EffectID}_공격력 버프 적용 + {Duration}초 지속");
     }
 
     protected override void Remove()
     {
-        if (targetStat != null)
+        if (_targetStat != null)
         {
-            targetStat.RemoveModifier(modifier);
+            _targetStat.RemoveModifier(_modifier);
         }
 
         Debug.Log($"{EffectID}_공격력 버프 종료");

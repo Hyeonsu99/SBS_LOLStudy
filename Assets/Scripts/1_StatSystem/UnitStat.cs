@@ -75,12 +75,12 @@ public class UnitStat : MonoBehaviour
     {
         if(_activeShields.Count > 0)
         {
-            for(int i = _activeShields.Count - 1; i >- 0; i--)
+            for(int i = _activeShields.Count - 1; i >= 0; i--)
             {
                 _activeShields[i].Duration -= Time.deltaTime;
                 if(_activeShields[i].Duration <= 0)
                 {
-                    _activeShields.RemoveAt(i);
+                    _activeShields.RemoveAt(i);                  
                 }
             }
         }
@@ -316,9 +316,12 @@ public class UnitStat : MonoBehaviour
 
     public void RemoveEffect(string id)
     {
-        if(_activeEffects.ContainsKey(id))
+        if(_activeEffects.TryGetValue(id, out Effect effect))
         {
-            Destroy(_activeEffects[id]);
+            effect.Terminate();
+
+            Destroy(effect);
+
             _activeEffects.Remove(id);
         }
     }

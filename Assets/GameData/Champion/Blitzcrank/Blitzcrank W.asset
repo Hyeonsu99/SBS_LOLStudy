@@ -9,26 +9,46 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 761854615c882bb40af7ad47ebf7fdb4, type: 3}
-  m_Name: Blitzcrank Passive
-  m_EditorClassIdentifier: Assembly-CSharp::BlitzPassiveData
+  m_Script: {fileID: 11500000, guid: 59fe65db37a72ed438d0593ff41ff065, type: 3}
+  m_Name: Blitzcrank W
+  m_EditorClassIdentifier: Assembly-CSharp::BlitzWData
   SkillId: 
   SkillName: 
   Icon: {fileID: 0}
   Description: 
   Type_Target: 0
-  Type_Delivery: 4
+  Type_Delivery: 3
   TargetMask: 15
   IsMovementSkill: 0
   MaxCharges: 0
   CastTime: 0
-  MaxLevel: 1
+  MaxLevel: 5
   Costs:
-  - 0
+  - 75
+  - 75
+  - 75
+  - 75
+  - 75
   Cooldowns:
-  - 90
+  - 15
+  - 15
+  - 15
+  - 15
+  - 15
   Ranges: []
   Radius: 0
-  MP_TO_SHILID_RATIO: 0.35
-  TriggerHp: 0.3
-  ShieldDuration: 10
+  AS_IncreaseAmount:
+  - 0.3
+  - 0.4
+  - 0.5
+  - 0.6
+  - 0.7
+  MS_IncreaseAmount:
+  - 0.6
+  - 0.65
+  - 0.7
+  - 0.75
+  - 0.8
+  Duration: 5
+  EndSlowPercent: 0.3
+  EndSlowDuration: 1.5
