@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4728d215effc1e4d860e2492103d5df, type: 3}
+  m_Name: Jhin R
+  m_EditorClassIdentifier: Assembly-CSharp::JhinRData
+  SkillId: 
+  SkillName: 
+  Icon: {fileID: 0}
+  Description: 
+  Type_Target: 3
+  Type_Delivery: 1
+  TargetMask: 7
+  IsMovementSkill: 0
+  MaxCharges: 0
+  CastTime: 0
+  MaxLevel: 5
+  Costs:
+  - 100
+  - 100
+  - 100
+  Cooldowns:
+  - 120
+  - 105
+  - 90
+  Ranges:
+  - 3400
+  - 3400
+  - 3400
+  Radius: 0
+  BaseDamages:
+  - 64
+  - 128
+  - 192
+  AdRatio: 0.25
+  MaxDamageMultiplier: 4
+  SlowPercentage: 0.8
+  SlowDuration: 0.5
+  Range: 34
+  FireDelay: 1
+  MaxDuration: 10
+  CameraZoomSize: 12
+  CameraOffsetDistance: 15
+  ProjectilePrefab: {fileID: 8841899945707824585, guid: cf9bc96dd40197e49992b477d632f774, type: 3}
