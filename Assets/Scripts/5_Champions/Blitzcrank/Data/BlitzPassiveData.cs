@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Skill/Blitzcrank/Passive")]
+[CreateAssetMenu(menuName = "Skill/Blitzcrank/Passive Data")]
 public class BlitzPassiveData : SkillData
 {
     public float MP_TO_SHILID_RATIO = 0.35f;

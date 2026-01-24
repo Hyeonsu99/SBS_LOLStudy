@@ -48,7 +48,20 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if(_skillHandler.IsCasting)
+        if (_stat.IsCC)
+        {
+            _movement.Stop();             // 이동 멈춤
+            _combatHandler.ClearTarget(); // 공격 대상 해제 (기절하면 때리던 것도 멈춤)
+            CancelPendingSkill();         // 예약된 스킬 취소
+            return;                       // 하위 로직 실행 차단
+        }
+
+        if(_stat.IsRoot)
+        {
+            _movement.Stop();
+        }
+
+        if (_skillHandler.IsCasting)
         {
             _movement.Stop();
             _combatHandler.ClearTarget();
@@ -100,7 +113,19 @@ public class PlayerController : MonoBehaviour
             }
 
             if (isConsumed) return;
-        }  
+        }
+
+        if (_stat.IsCC) return;
+
+        if (_stat.IsRoot && action == PlayerAction.Move)
+        {
+            return;
+        }
+
+        if (_stat.IsSilenced && (action == PlayerAction.CastSkill || action == PlayerAction.CastSummoner))
+        {
+            return;
+        }
 
         if (_skillHandler.IsCasting) return;
 
@@ -135,6 +160,12 @@ public class PlayerController : MonoBehaviour
     {
         var command = _pendingSkillCtx.skillCommand;
 
+        if (_stat.IsCC || _stat.IsSilenced)
+        {
+            CancelPendingSkill();
+            return;
+        }
+
         // 추격 도중 스킬이 준비되지 않았거나 타겟이 사라지면 취소
         if (!_skillHandler.IsSkillReady(command))
         {
@@ -159,6 +190,13 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            if (_stat.IsRoot)
+            {
+                _movement.Stop();
+                _isSkillPending = false;
+                return;
+            }
+
             Vector3 dest;
 
             // 1. 유닛 타겟팅이고 타겟이 있다면 -> 타겟의 위치로 이동

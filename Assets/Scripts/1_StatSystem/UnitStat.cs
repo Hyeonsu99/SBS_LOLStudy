@@ -13,8 +13,14 @@ public class UnitStat : MonoBehaviour
     [ShowInInspector] public float CurrentMP { get; private set; }
     [ShowInInspector] public float CurrentShield => _activeShields.Sum(s => s.Amount);
 
-    public bool IsRoot => HasEffect(EffectType.Root);
     public bool IsDead => CurrentHP <= 0;
+    public bool IsRoot => HasEffect(EffectType.Root);
+    public bool IsStunned => HasEffect(EffectType.Stun);
+    public bool IsSilenced => HasEffect(EffectType.Silence);
+    public bool IsAirborne => HasEffect(EffectType.Airborne);
+
+    public bool IsCC => IsDead || IsStunned || IsAirborne;
+    
 
     private readonly List<StatModifier> _mods = new();
     private readonly Dictionary<string, Effect> _activeEffects = new();

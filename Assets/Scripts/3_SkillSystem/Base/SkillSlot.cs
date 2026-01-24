@@ -127,10 +127,11 @@ public class SkillSlot : MonoBehaviour
     public bool TryCast(GameObject target, Vector3 position)
     {
         if(!IsReady) return false;
-
         if (_skillHandler.IsCasting) return false;
 
         if (_ownerStat.IsRoot && _data.IsMovementSkill) return false;
+
+        if(_ownerStat.HasEffect(EffectType.Silence) || _ownerStat.HasEffect(EffectType.Stun)) return false;
 
         float cost = _data.GetCost(_level);
         if (_ownerStat.CurrentMP < cost) return false;
@@ -159,16 +160,30 @@ public class SkillSlot : MonoBehaviour
         _skillHandler.IsCasting = true;
 
         // 3. 시전 시작 훅 (시각 효과 등)
-        _data.OnCastStart(_owner, position, _level);
+        //_data.OnCastStart(_owner, position, _level);
+        float elapsed = 0f;
+        while (elapsed < _data.CastTime)
+        {
+            // 매 프레임 상태 체크: 사망, 기절, 침묵 시 캐스팅 취소
+            if (_ownerStat.IsDead ||
+                _ownerStat.HasEffect(EffectType.Stun) ||
+                _ownerStat.HasEffect(EffectType.Silence))
+            {
+                _skillHandler.IsCasting = false;
+                _data.OnCastFinished(_owner);
+                Debug.Log($"[{_data.name}] 시전이 방해받아 취소되었습니다.");
+                yield break; // 코루틴 종료 (Execute 실행 안 됨)
+            }
 
-        // 4. 대기
-        yield return new WaitForSeconds(_data.CastTime);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
 
         // 5. 스킬 실발동
         _data.Execute(_owner, target, position, _level);
 
         // 6. 종료 처리
-        _data.OnCastFinished(_owner);
+        //_data.OnCastFinished(_owner);
         _skillHandler.IsCasting = false;
     }
 

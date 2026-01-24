@@ -155,6 +155,12 @@ public class CombatHandler : MonoBehaviour
         _currentTarget = null;
         _targetStat = null;
     }
+
+    // 공격 타이머 초기화(평캔)
+    public void ResetAttackTimer()
+    {
+        _lastAttackTime = -999f;
+    }
     public bool HasTarget() => _currentTarget != null;
     public Vector3 GetTargetPosition() => _currentTarget != null ? _currentTarget.transform.position : transform.position;
 
