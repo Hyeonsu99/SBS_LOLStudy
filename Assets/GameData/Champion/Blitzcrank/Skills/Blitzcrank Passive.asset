@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlitzPassiveData
   SkillId: 
   SkillName: 
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: de6e5c7ea9882134cb044988fecd3c9c, type: 3}
   Description: 
   Type_Target: 0
   Type_Delivery: 4

@@ -57,7 +57,7 @@ public class BlitzEHandler : MonoBehaviour, IAttackProvider
 
     public void DecorateDamage(ref DamageInfo info, UnitStat attacker, UnitStat target)
     {
-        if (_isSkillActive) return;
+        if (!_isSkillActive) return;
         if (info.Type != DamageType.Physical) return;
 
         info.RawDamage *= _data.DamageMultiplier;

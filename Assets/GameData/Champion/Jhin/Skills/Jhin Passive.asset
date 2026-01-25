@@ -14,11 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::JhinPassiveData
   SkillId: 
   SkillName: 
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 655dd020ff3b77f47bd5c32520069f9c, type: 3}
   Description: 
   Type_Target: 0
   Type_Delivery: 4
   TargetMask: 15
+  IsMovementSkill: 0
+  MaxCharges: 0
+  CastTime: 0
   MaxLevel: 5
   Costs: []
   Cooldowns: []

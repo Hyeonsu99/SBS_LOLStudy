@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlitzQData
   SkillId: 
   SkillName: 
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 9f45e32c12ec9f74ea0695eb957affe1, type: 3}
   Description: 
   Type_Target: 3
   Type_Delivery: 1
@@ -49,4 +49,4 @@ MonoBehaviour:
   MaxDistance: 10.79
   PullOffsetDistance: 0.75
   MaxStunDuration: 0.65
-  ProjectilePrefab: {fileID: 0}
+  ProjectilePrefab: {fileID: 8841899945707824585, guid: bbbe401bde3a6fe42b46bf539bf569da, type: 3}

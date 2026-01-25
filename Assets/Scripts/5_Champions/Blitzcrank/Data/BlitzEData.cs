@@ -18,6 +18,10 @@ public class BlitzEData : SkillData
 
     public override void Execute(GameObject owner, GameObject target, Vector3 position, int level)
     {
-        base.Execute(owner, target, position, level);
+        var handler = owner.GetComponent<BlitzEHandler>();
+        if (handler != null)
+        {
+            handler.Activate();
+        }
     }
 }

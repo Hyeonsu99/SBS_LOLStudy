@@ -16,7 +16,8 @@ public enum StatType
     MagicResist,
     MoveSpeed,
     CriticalAmount,
-    CriticalDamage
+    CriticalDamage,
+    AbilityHaste
 }
 
 public enum ModType
@@ -94,4 +95,5 @@ public interface IStat
     float Armor { get; }
     float MagicResist { get; }
     float MoveSpeed { get; }
+    float AbilityHaste { get; }
 }

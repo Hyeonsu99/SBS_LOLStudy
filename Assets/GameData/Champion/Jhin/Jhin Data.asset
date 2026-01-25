@@ -10,8 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48128be8f1107b54d94bd5b846027290, type: 3}
-  m_Name: Jhin Skill
+  m_Name: Jhin Data
   m_EditorClassIdentifier: Assembly-CSharp::ChampionData
+  Name: Jhin
+  Prefab: {fileID: 594239448082165551, guid: 6711125e7c3578c49b562453fafa847b, type: 3}
+  Portrait: {fileID: 0}
   Passive: {fileID: 11400000, guid: eeff50e2734b80247bffe0893f7d3723, type: 2}
   Q: {fileID: 11400000, guid: 50892a75964efec478ed20d47ff3df0d, type: 2}
   W: {fileID: 11400000, guid: db8684bbb66a2f8489995f69ba30acbd, type: 2}

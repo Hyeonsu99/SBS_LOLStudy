@@ -16,6 +16,7 @@ public enum EffectType
     
     // 특정 챔피언의 디버프
     JhinMark,
+    BlitzRMark,
 
     // CC기 타입
     Root,
@@ -48,6 +49,8 @@ public static class EffectFactory
                 return CreateEffect<SlowDebuff>(target, stat, type, mod, duration, value);
             case EffectType.JhinMark:
                 return CreateEffect<JhinMarkDebuff>(target, stat, type, mod, duration, value);
+            case EffectType.BlitzRMark:
+                return CreateEffect<BlitzRMark>(target, stat, type, mod, duration, value);
 
             // --- CC기 (통합 관리) ---
             case EffectType.Root:
@@ -73,6 +76,7 @@ public static class EffectFactory
         else if (effectComponent is AttackSpeedBuff attackSpeed) attackSpeed.Initialize(stat, duration, mod, value, type);
         else if (effectComponent is SlowDebuff slow) slow.Initialize(stat, duration, value, type); // Slow는 value 필요
         else if (effectComponent is JhinMarkDebuff jhin) jhin.Initialize(stat, duration, type);
+        else if (effectComponent is BlitzRMark blitz) blitz.Initialize(stat, duration, type, value);
 
         // 2. [신규] 단순 CC기 (Stun, Silence, Root)
         else if (effectComponent is CCDebuff cc)
@@ -80,7 +84,7 @@ public static class EffectFactory
             // CC기는 ModType이나 Value가 필요 없음
             cc.Initialize(stat, duration, type);
         }
-        else if (effectComponent is RootDebuff root) // 혹시 RootDebuff를 따로 쓰신다면 유지
+        else if (effectComponent is RootDebuff root)
         {
             root.Initialize(stat, duration, type);
         }

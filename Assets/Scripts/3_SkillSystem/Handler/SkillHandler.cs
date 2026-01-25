@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SkillHandler : MonoBehaviour
 {
-    public ChampionSkillData MyChampionData;
+    public ChampionData MyChampionData;
     private UnitStat _stat;
 
     public SkillSlot Slot_Passive;
@@ -39,6 +39,22 @@ public class SkillHandler : MonoBehaviour
             slot.Initialize(data, gameObject, _stat);
     }
 
+    public void InitializeSkills(ChampionData data)
+    {
+        if (data == null)
+        {
+            Debug.LogError("ChampionData is null!");
+            return;
+        }
+
+        if (Slot_Passive != null) Slot_Passive.Initialize(data.Passive, gameObject, _stat);
+        if (Slot_Q != null) Slot_Q.Initialize(data.Q, gameObject, _stat);
+        if (Slot_W != null) Slot_W.Initialize(data.W, gameObject, _stat);
+        if (Slot_E != null) Slot_E.Initialize(data.E, gameObject, _stat);
+        if (Slot_R != null) Slot_R.Initialize(data.R, gameObject, _stat);
+
+        Debug.Log($"[{data.Name}] 스킬 데이터 로드 완료");
+    }
     public SkillSlot GetSKillSlot(SkillCommand cmd)
     {
         return cmd switch
@@ -49,6 +65,17 @@ public class SkillHandler : MonoBehaviour
             SkillCommand.R => Slot_R,
             _ => null
         };
+    }
+
+    public SkillSlot GetSkillSlotByData(SkillData data)
+    {
+        if (Slot_Q.Data == data) return Slot_Q;
+        if (Slot_W.Data == data) return Slot_W;
+        if (Slot_E.Data == data) return Slot_E;
+        if (Slot_R.Data == data) return Slot_R;
+        if (Slot_Passive.Data == data) return Slot_Passive;
+
+        return null;
     }
 
     public bool IsSkillInRange(InputContext ctx)

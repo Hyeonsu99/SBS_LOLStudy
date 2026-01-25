@@ -23,6 +23,7 @@ public class StatEntity : IStat
     public float Armor => Get(StatType.Armor);
     public float MagicResist => Get(StatType.MagicResist);
     public float MoveSpeed => Get(StatType.MoveSpeed);
+    public float AbilityHaste => Get(StatType.AbilityHaste);
 }
 
 public class StatDecorator : IStat
@@ -79,6 +80,8 @@ public class StatDecorator : IStat
     public float Armor => Get(StatType.Armor);
     public float MagicResist => Get(StatType.MagicResist);
     public float MoveSpeed => Get(StatType.MoveSpeed);
+    public float AblityHaste => Get(StatType.AbilityHaste);
+    public float AbilityHaste => Get(StatType.AbilityHaste);
 }
 
 public class LevelStatDecorator : IStat
@@ -126,6 +129,7 @@ public class LevelStatDecorator : IStat
     public float Armor => Get(StatType.Armor);
     public float MagicResist => Get(StatType.MagicResist);
     public float MoveSpeed => Get(StatType.MoveSpeed);
+    public float AbilityHaste => Get(StatType.AbilityHaste);
 }
 
 public class TransformStatDecorator : IStat
@@ -167,6 +171,7 @@ public class TransformStatDecorator : IStat
     public float Armor => Get(StatType.Armor);
     public float MagicResist => Get(StatType.MagicResist);
     public float MoveSpeed => Get(StatType.MoveSpeed);
+    public float AbilityHaste => Get(StatType.AbilityHaste);
 }
 
 

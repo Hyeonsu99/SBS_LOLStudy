@@ -18,7 +18,6 @@ public class SpeedBuff : Effect
         // 곱연산 증가
         _modifier = new StatModifier(EffectID, StatType.MoveSpeed, modType, speedBonus, ModifierType.Buff);
         _targetStat.AddModifier(_modifier);
-        Debug.Log($"{EffectID}_이동속도 버프 적용 + {Duration}초 지속");
     }
 
     protected override void Remove()
@@ -26,9 +25,6 @@ public class SpeedBuff : Effect
         if(_targetStat != null)
         {
             _targetStat.RemoveModifier(_modifier);
-        }
-        
-        Debug.Log($"{EffectID}__이동속도 버프 종료");
-        Debug.Log($"현재 이동속도 : {_targetStat.Current.Get(StatType.MoveSpeed)}");
+        }      
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Build;
 using UnityEngine;
 
 public class CombatHandler : MonoBehaviour
@@ -12,9 +13,11 @@ public class CombatHandler : MonoBehaviour
     private const float RANGE_UNIT_SCALE = 100f;
 
     private GameObject _currentTarget;
+    public GameObject CurrentTarget => _currentTarget;
     private UnitStat _targetStat;
 
     private float _lastAttackTime;
+    [SerializeField] private bool _isRangeAttack = false;
 
     private List<IAttackConstraint> _constraints = new();
     private List<IAttackProvider> _damageProviders = new();
@@ -97,33 +100,57 @@ public class CombatHandler : MonoBehaviour
             if (!constraint.CanAttack()) return;
         }
 
-        DamageInfo info = new DamageInfo
-        {
-            Attacker = gameObject,
-            Target = _currentTarget,
-            RawDamage = _unitStat.Current.Get(StatType.AttackDamage),
-            BonusDamage = 0,
-            Type = DamageType.Physical,
-            isCritical = IsCritical()
-        };
+        OnAttackPerformed?.Invoke();
 
-        foreach(var provider in _damageProviders)
-        {
-            provider.DecorateDamage(ref info, _unitStat, _targetStat);
-        }
-
-        float finalDamage = DamageCalculater.CalculateFinalDamage(_unitStat, _targetStat, info);
-        _targetStat.TakeDamage(finalDamage, gameObject);
-
+        // 3. 자원 소모 (탄환 감소)
         foreach (var constraint in _constraints)
         {
             constraint.OnAttack();
         }
 
-        OnAttackPerformed?.Invoke();
+        if (_isRangeAttack)
+        {
+            // 원거리는 여기서 끝
+        }
+        else
+        {
+            ApplyDamage(_currentTarget);
+        }
+    }
+
+    public void ApplyDamage(GameObject target, bool forceCrit = false)
+    {
+        if (target == null) return;
+        if (!target.TryGetComponent(out UnitStat targetStat)) return;
+
+        // 1. 데미지 정보 생성
+        DamageInfo info = new DamageInfo
+        {
+            Attacker = gameObject,
+            Target = target,
+            RawDamage = _unitStat.Current.Get(StatType.AttackDamage),
+            BonusDamage = 0,
+            Type = DamageType.Physical,
+            // 진 4타처럼 강제 치명타가 넘어오면 true, 아니면 확률 계산
+            isCritical = forceCrit || IsCritical()
+        };
+
+        // 2. 데미지 데코레이팅 (진 패시브: 잃은 체력 비례 데미지 등 추가)
+        foreach (var provider in _damageProviders)
+        {
+            provider.DecorateDamage(ref info, _unitStat, targetStat);
+        }
+
+        // 3. 최종 데미지 계산
+        float finalDamage = DamageCalculater.CalculateFinalDamage(_unitStat, targetStat, info);
+
+        // 4. 적용
+        targetStat.TakeDamage(finalDamage, gameObject);
+
+        // 5. 적중 시 이벤트 (흡혈 등 처리)
         OnHitUpdate?.Invoke(info);
 
-        Debug.Log($"[Combat] {gameObject.name} -> {_currentTarget.name} | Final Damage: {finalDamage}");
+        Debug.Log($"[Combat] {gameObject.name} -> {target.name} | Final Damage: {finalDamage} (Crit: {info.isCritical})");
     }
 
     private bool IsCritical()

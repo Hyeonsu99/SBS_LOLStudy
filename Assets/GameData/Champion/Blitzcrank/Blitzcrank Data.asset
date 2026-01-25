@@ -10,10 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48128be8f1107b54d94bd5b846027290, type: 3}
-  m_Name: Blitzcrank Skill
+  m_Name: Blitzcrank Data
   m_EditorClassIdentifier: Assembly-CSharp::ChampionSkillData
+  Name: Blitzcrank
+  Prefab: {fileID: 6081083256334231549, guid: f76bb28aca8709746885ffcac9d8e7f5, type: 3}
+  Portrait: {fileID: 0}
   Passive: {fileID: 11400000, guid: 49c83876ccd388b48b51103bc0187508, type: 2}
-  Q: {fileID: 0}
+  Q: {fileID: 11400000, guid: ce9d5389c44df5b4481e070e0cc6abda, type: 2}
   W: {fileID: 11400000, guid: 51ec0e4ed6dfbaf4db5b4f86ed25b157, type: 2}
-  E: {fileID: 0}
-  R: {fileID: 0}
+  E: {fileID: 11400000, guid: 22d36d5a6b57d78489dc149da8027456, type: 2}
+  R: {fileID: 11400000, guid: d5df7a793dce4e7479275b6c4a033f7d, type: 2}

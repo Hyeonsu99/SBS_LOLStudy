@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
@@ -8,9 +9,11 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
     private JhinPassiveData _data;
     private UnitStat _stat;
 
-    public int CurrentAmmo { get; private set; } = 4;
+    [ShowInInspector] public int CurrentAmmo { get; private set; } = 4;
     public bool IsReloading { get; private set; }
     private float _lastActionTime;
+
+    public bool ProcessFourthShot { get; set; } = false;
 
     private void Update()
     {
@@ -26,9 +29,28 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
         _stat = stat;
         _stat.AddTransformer(this);
 
-        if(TryGetComponent(out CombatHandler combat))
+        if (TryGetComponent(out CombatHandler combat))
         {
-            combat.OnHitUpdate += (info) => { if (info.isCritical) OnCriticalHit(); };
+            // [수정] 일반적인 치명타(랜덤)는 맞았을 때 버프 적용
+            combat.OnHitUpdate += (info) =>
+            {
+                // 4타가 아닌 일반 치명타일 경우 여기서 버프 적용
+                // (4타는 발사할 때 이미 적용했으므로 중복 적용되지만, 시간 갱신이라 문제 없음)
+                if (info.isCritical && !ProcessFourthShot)
+                    OnCriticalHit();
+            };
+
+            // [추가] 4타(확정 치명타)는 발사하는 순간 버프 적용
+            combat.OnAttackPerformed += OnAttackStart;
+        }
+    }
+
+    private void OnAttackStart()
+    {
+        if (CurrentAmmo == 1)
+        {
+            OnCriticalHit();
+            Debug.Log("진 4타 발사! (즉시 이속 버프 적용)");
         }
     }
 
@@ -60,9 +82,9 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
 
     public void DecorateDamage(ref DamageInfo info, UnitStat attacker, UnitStat target)
     {
-        if(CurrentAmmo == 1)
+        if (ProcessFourthShot)
         {
-            info.isCritical = true;
+            info.isCritical = true; // 강제 치명타
 
             float maxHp = target.Current.Get(StatType.Hp);
             float currentHp = target.CurrentHP;
@@ -102,8 +124,6 @@ public class JhinPassiveHandler : MonoBehaviour, IStatTransformer, IAttackConstr
         float statFactor = 0.14f + (bonusAS * _data.AS_to_SPD_Ratio);
 
         _stat.ApplyEffect(EffectType.SpeedBuff, ModType.PercentAdd, 2f, statFactor, "Jhin_Haste");
-
-        Debug.Log("치명타 발생! 이동속도 2초간 증가");
     }
 
     private IEnumerator ReloadCoroutine()

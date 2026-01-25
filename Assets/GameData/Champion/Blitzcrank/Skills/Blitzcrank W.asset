@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlitzWData
   SkillId: 
   SkillName: 
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 49601cb2edd26db40a1fd1ba11d53170, type: 3}
   Description: 
   Type_Target: 0
   Type_Delivery: 3

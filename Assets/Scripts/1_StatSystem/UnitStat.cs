@@ -29,7 +29,9 @@ public class UnitStat : MonoBehaviour
 
     public event Action<float, GameObject, bool> OnTakeDamage;
     public event Action<GameObject> OnDeath;
-    public event Action OnStatChanged;
+    public event Action<StatType, float> OnStatChanged;
+
+
 
     [Title("Final Statistics")]
     [ShowInInspector, Sirenix.OdinInspector.ReadOnly]
@@ -192,6 +194,22 @@ public class UnitStat : MonoBehaviour
         }
     }
 
+    public void RefreshStat(StatType type)
+    {
+        float value = Current.Get(type);
+
+        OnStatChanged?.Invoke(type, value);
+    }
+
+    // 스탯 전체를 한번에 초기화
+    public void RefreshAllStats()
+    {
+        foreach (StatType type in (StatType[])Enum.GetValues(typeof(StatType)))
+        {
+            RefreshStat(type);
+        }
+    }
+
     public void Rebuild()
     {
         if (StatData == null) return;
@@ -248,8 +266,6 @@ public class UnitStat : MonoBehaviour
         }
 
         Current = result;
-
-        OnStatChanged?.Invoke();
     }
 
     public float GetBonusStat(StatType type)
