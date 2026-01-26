@@ -266,6 +266,8 @@ public class UnitStat : MonoBehaviour
         }
 
         Current = result;
+
+        RefreshAllStats();
     }
 
     public float GetBonusStat(StatType type)

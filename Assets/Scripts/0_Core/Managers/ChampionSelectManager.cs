@@ -59,7 +59,6 @@ public class ChampionSelectManager : MonoBehaviour
 
             if (_currentInstance.TryGetComponent(out SkillHandler skillHandler) && _currentInstance.TryGetComponent(out UnitStat stat))
             {
-                // 핸들러에게 "네가 쓸 슬롯은 이거야"라고 알려줌
                 skillHandler.Slot_Passive = SceneSlot_Passive;
                 skillHandler.Slot_Q = SceneSlot_Q;
                 skillHandler.Slot_W = SceneSlot_W;
@@ -75,6 +74,13 @@ public class ChampionSelectManager : MonoBehaviour
                 if (SceneSlot_R) SceneSlot_R.Initialize(data.R, _currentInstance, stat);
             }
 
+            if(_currentInstance.TryGetComponent(out PlayerController controller))
+            {
+                controller._defaultCam = ChampionCam.gameObject;
+                controller._ultimateCamera = UltimateCam.gameObject;
+            }
+
+
             // 카메라는 변경 예정
             if (ChampionCam != null)
             {
@@ -87,6 +93,7 @@ public class ChampionSelectManager : MonoBehaviour
                 UltimateCam.Follow = _currentInstance.transform;
                 UltimateCam.LookAt = _currentInstance.transform;
             }
+
 
             OnChampionSpawned?.Invoke(_currentInstance);
             SelectPanel.SetActive(false);

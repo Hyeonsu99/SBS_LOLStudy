@@ -20,8 +20,8 @@ public class PlayerController : MonoBehaviour
 
     private IInputOverride _inputOverrider;
 
-    [SerializeField] private GameObject _defaultCam;
-    [SerializeField] private GameObject _ultimateCamera;
+    public GameObject _defaultCam;
+    public GameObject _ultimateCamera;
 
     private void Awake()
     {
@@ -50,10 +50,10 @@ public class PlayerController : MonoBehaviour
 
         if (_stat.IsCC)
         {
-            _movement.Stop();             // 이동 멈춤
-            _combatHandler.ClearTarget(); // 공격 대상 해제 (기절하면 때리던 것도 멈춤)
-            CancelPendingSkill();         // 예약된 스킬 취소
-            return;                       // 하위 로직 실행 차단
+            _movement.Stop();             
+            _combatHandler.ClearTarget(); 
+            CancelPendingSkill();         
+            return;                       
         }
 
         if(_stat.IsRoot)
@@ -199,12 +199,10 @@ public class PlayerController : MonoBehaviour
 
             Vector3 dest;
 
-            // 1. 유닛 타겟팅이고 타겟이 있다면 -> 타겟의 위치로 이동
             if (slot.IsUnitTargeting && _pendingSkillCtx.target != null)
             {
                 dest = _pendingSkillCtx.target.transform.position;
             }
-            // 2. 그 외(지점 타겟팅 등) -> 클릭한 좌표(ctx.position)로 이동
             else
             {
                 dest = _pendingSkillCtx.position;
