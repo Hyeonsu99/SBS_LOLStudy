@@ -214,10 +214,11 @@ public class UnitStat : MonoBehaviour
     {
         if (StatData == null) return;
 
+        // 캐릭터 기본 능력치를 저장한다.
         IStat baseEntity = new StatEntity(StatData);
         IStat result = baseEntity;
 
-        // 레벨 Modifier 적용
+        // 현재 레벨을 알아옵니다. 
         foreach(var mod in _mods)
         {
             if(mod.Stat == StatType.Level)
@@ -227,31 +228,35 @@ public class UnitStat : MonoBehaviour
         // 레벨당 성장 적용
         result = new LevelStatDecorator(result, StatData);
 
-        foreach(var mod in _mods)
+        // 단순 덧셈 계산 적용
+        foreach (var mod in _mods)
         {
-            if(mod.Stat != StatType.Level && mod.Mod == ModType.Flat)
+            if (mod.Stat != StatType.Level && mod.Mod == ModType.Flat)
             {
                 result = new StatDecorator(result, mod, baseEntity);
             }
         }
 
-        foreach(StatType type in Enum.GetValues(typeof(StatType)))
+        // 합 연산 적용 (증가치를 모두 더한 다음 한번에 계산)
+        foreach (StatType type in Enum.GetValues(typeof(StatType)))
         {
             float totalPercent = 0f;
-
             var percentMods = _mods.FindAll(m => m.Stat == type && m.Mod == ModType.PercentAdd);
 
-            if(percentMods.Count > 0)
+            if (percentMods.Count > 0)
             {
                 foreach (var mod in percentMods)
+
                     totalPercent += mod.Value;
 
                 var sumMod = new StatModifier($"{type}_SumPercent", type, ModType.PercentAdd, totalPercent, ModifierType.Passive);
+
                 result = new StatDecorator(result, sumMod, baseEntity);
             }
         }
 
-        foreach(var mod in _mods)
+        // 기타 능력치 적용(곱 연산)
+        foreach (var mod in _mods)
         {
             if (mod.Stat != StatType.Level && mod.Mod == ModType.PercentMul)
             {
@@ -260,13 +265,14 @@ public class UnitStat : MonoBehaviour
         }
 
         // 스탯 변환 적용(방어력의 50%만큼 체력이 늘어난다던지...)
-        if(_transformers.Count > 0)
+        if (_transformers.Count > 0)
         {
             result = new TransformStatDecorator(result, baseEntity, _transformers);
         }
 
         Current = result;
 
+        // 계산된 능력치를 UI에 적용
         RefreshAllStats();
     }
 

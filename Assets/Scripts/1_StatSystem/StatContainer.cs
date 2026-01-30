@@ -38,6 +38,7 @@ public class StatDecorator : IStat
         _mod = mod;
         _baseEntity = baseEntity;
     }
+    
     public float Get(StatType type)
     {
         float value = _wrapped.Get(type);

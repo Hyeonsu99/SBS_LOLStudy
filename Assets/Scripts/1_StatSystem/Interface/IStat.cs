@@ -20,6 +20,7 @@ public enum StatType
     AbilityHaste
 }
 
+// 어떤식의 계산을 사용할 것인가...
 public enum ModType
 {
     Flat,
@@ -45,6 +46,7 @@ public readonly struct StatModifier
     public readonly float Value;
     public readonly ModifierType Type;
 
+    // 아이디가 없는 것(제거할 필요가 없는 스탯들)
     public StatModifier(StatType stat, ModType mode, float value, ModifierType type)
     {
         ID = null;
@@ -54,6 +56,7 @@ public readonly struct StatModifier
         Type = type;
     }
 
+    // 아이디가 있는 것(제거할 필요가 있는 스탯들)
     public StatModifier(string id, StatType stat, ModType mode, float value, ModifierType type)
     {
         ID = id;
